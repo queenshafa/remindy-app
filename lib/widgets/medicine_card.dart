@@ -10,7 +10,7 @@ class MedicineCard extends StatelessWidget {
     required this.onTap,
     required this.time,
     required this.isMeal,
-    this.category = 'Morning', // Badge samping
+    this.category = 'Morning',
   });
 
   final String title;
@@ -22,14 +22,12 @@ class MedicineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Format waktu DateTime -> "09.00"
     final String formattedTime =
         "${time.hour.toString().padLeft(2, '0')}.${time.minute.toString().padLeft(2, '0')}";
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Kartu Utama
         Expanded(
           child: Material(
             color: Colors.white,
@@ -42,10 +40,9 @@ class MedicineCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row Atas: Chip Waktu & Chip Status Makan
                     Row(
                       children: [
-                        // Chip Jam dengan Titik Putih
+                        // Time Chip
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -80,7 +77,7 @@ class MedicineCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
 
-                        // Chip Status Makan
+                        // isMeal Chip
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -102,20 +99,18 @@ class MedicineCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Row Bawah: Nama & Dosis Obat + Tombol Consume
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // Info Obat (Title & Quantity)
+                        // Meds Information (Title & Quantity)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               title,
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primary,
                               ),
@@ -132,7 +127,7 @@ class MedicineCard extends StatelessWidget {
                           ],
                         ),
 
-                        // Tombol Consume
+                        // Consume Btn
                         GestureDetector(
                           onTap: onTap,
                           child: Container(
@@ -164,23 +159,24 @@ class MedicineCard extends StatelessWidget {
         ),
         const SizedBox(width: 10),
 
-        // Badge Samping Vertikal ("Morning")
+        // Side Vertical Badge
         Container(
-          width: 44,
-          height: 110,
+          width: 50,
+          height: 130,
           decoration: BoxDecoration(
             color: const Color(0xFF7E7D7A),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Center(
             child: RotatedBox(
-              quarterTurns: 1, // Memutar teks vertikal
+              // Turn texts vertical
+              quarterTurns: 1,
               child: Text(
                 category,
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 15,
+                  fontSize: 20,
                 ),
               ),
             ),

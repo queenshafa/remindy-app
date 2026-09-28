@@ -1,77 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:remindy_app/data/dummy_data.dart'; // Sesuaikan lokasi data kamu
+import 'package:remindy_app/models/medicine.dart'; // Sesuaikan model kamu
 import 'package:remindy_app/theme/app_theme.dart';
-import 'package:remindy_app/widgets/button_banner.dart';
-import 'package:remindy_app/widgets/circle_icon_button.dart';
+import 'package:remindy_app/widgets/home_content_header.dart';
+import 'package:remindy_app/widgets/medicine_card.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
   Widget build(BuildContext context) {
+    // Ambil data obat dari dummy
+    final List<Medicine> medicines = dummyMedicines;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'G\'day, User!',
+        child: CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(child: HomeContentHeader()),
+            // If no meds data availble
+            if (medicines.isEmpty)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Text(
+                    'No medications scheduled',
                     style: TextStyle(
-                      fontSize: 36,
                       color: AppTheme.textSecondary,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      CircleIconButton(
-                        icon: Icons.settings_outlined,
-                        onTap: () {},
+                ),
+              )
+            else
+              // Meds Card
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final medicine = medicines[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: MedicineCard(
+                        title: medicine.title,
+                        quantity: medicine.quantity,
+                        time: medicine.time,
+                        isMeal: medicine.isMeal,
+                        category: medicine.category,
+                        onTap: () {
+                          // Action saat tombol / card diklik
+                        },
                       ),
-                      SizedBox(width: 10),
-                      CircleIconButton(
-                        icon: Icons.notifications_outlined,
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ],
+                    );
+                  }, childCount: medicines.length),
+                ),
               ),
-              Text(
-                'Are You Taking Your Meds Regularly?',
-                style: AppTheme.display(),
-              ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ButtonBanner(
-                    icon: Icons.link,
-                    onTap: () {},
-                    title: 'Adherence Rate',
-                    description: '90% Adherence',
-                  ),
-                  SizedBox(width: 10),
-                  ButtonBanner(
-                    icon: Icons.calendar_month_outlined,
-                    onTap: () {},
-                    title: 'Day 45/180',
-                    description: '135 Days Left',
-                  ),
-                ],
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

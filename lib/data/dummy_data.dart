@@ -1,4 +1,3 @@
-// lib/data/dummy_data.dart
 import '../models/medicine.dart';
 
 class DummyUser {
