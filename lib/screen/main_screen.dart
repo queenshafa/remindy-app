@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:remindy_app/screen/home_screen.dart';
+import 'package:remindy_app/screen/meds_detail_screen.dart';
 import 'package:remindy_app/screen/meds_screen.dart';
 import 'package:remindy_app/widgets/add_meds_bottom_sheet.dart';
 import 'package:remindy_app/widgets/custom_bottom_navbar.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   // 1. Perbaiki list screens, ganti index ke-3 dengan widget kosong (placeholder) saja
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('History Screen')),
+    const MedsDetailScreen(),
     const MedsScreen(),
     const SizedBox(), // Placeholder untuk tab '+' (tidak akan ditampilkan penuh)
   ];

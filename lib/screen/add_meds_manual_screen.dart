@@ -17,11 +17,19 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
   final _hourCtrl = TextEditingController();
   final _minuteCtrl = TextEditingController();
   final _periodLengthCtrl = TextEditingController();
-  final _periodUnitCtrl = TextEditingController(text: 'Day');
 
   String _dosageType = 'Capsule';
+  String _periodUnit = 'Day';
   int _dosagePerDay = 1;
   bool _isAfterMeal = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hourCtrl.text = '00';
+    _minuteCtrl.text = '00';
+    _periodLengthCtrl.text = '00';
+  }
 
   @override
   void dispose() {
@@ -30,7 +38,6 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
     _hourCtrl.dispose();
     _minuteCtrl.dispose();
     _periodLengthCtrl.dispose();
-    _periodUnitCtrl.dispose();
     super.dispose();
   }
 
@@ -111,9 +118,15 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const MedsLabel('Period:'),
+                        // Panggil MedsPeriodInput dengan parameter Dropdown yang baru
                         MedsPeriodInput(
                           lengthCtrl: _periodLengthCtrl,
-                          unitCtrl: _periodUnitCtrl,
+                          unitValue: _periodUnit,
+                          onUnitChanged: (val) {
+                            if (val != null) {
+                              setState(() => _periodUnit = val);
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -136,12 +149,11 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Tombol Submit
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {}, // TODO: Save Action
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     shape: RoundedRectangleBorder(

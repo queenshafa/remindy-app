@@ -6,7 +6,7 @@ class AddMedsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -14,10 +14,6 @@ class AddMedsHeader extends StatelessWidget {
             backgroundColor: Colors.white,
             child: Icon(Icons.arrow_back, color: Colors.black),
           ),
-        ),
-        const CircleAvatar(
-          backgroundColor: Colors.white,
-          child: Icon(Icons.add, color: Colors.black),
         ),
       ],
     );

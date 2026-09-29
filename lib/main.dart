@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/screen/home_screen.dart';
 import 'package:remindy_app/screen/main_screen.dart';
+import 'package:remindy_app/screen/onboarding_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: AppTheme.theme,
-      home: MainScreen(),
+      home: OnboardingScreen(),
     );
   }
 }
