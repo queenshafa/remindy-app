@@ -484,7 +484,7 @@ class _CircleInput extends StatelessWidget {
   final int limit;
   final int? maxValue; // Batas atas (contoh: 23 atau 59)
 
-  const _CircleInput(this.ctrl, this.hint, {this.limit = 2, this.maxValue});
+  const _CircleInput(this.ctrl, this.hint, {this.limit = 2}) : maxValue = null;
 
   @override
   Widget build(BuildContext context) => Container(

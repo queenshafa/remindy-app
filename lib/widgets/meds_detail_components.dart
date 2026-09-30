@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 
 // 1. Header Navigation (Back & Edit)
@@ -39,7 +40,7 @@ class DetailImageBanner extends StatelessWidget {
       image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
           blurRadius: 10,
           offset: const Offset(0, 4),
         ),
@@ -149,7 +150,18 @@ class DetailRemainChip extends StatelessWidget {
 
 // 5. Grid Kotak Info Putih (Dosage, Time, Total, Instruction)
 class DetailInfoGrid extends StatelessWidget {
-  const DetailInfoGrid({super.key});
+  final Medicine medicine;
+  const DetailInfoGrid({super.key, required this.medicine});
+
+  // Fungsi helper untuk memformat jam 10:00 -> 10.00 AM
+  String _formatTime(DateTime time) {
+    int h = time.hour > 12 ? time.hour - 12 : time.hour;
+    if (h == 0) h = 12;
+    String hr = h.toString().padLeft(2, '0');
+    String min = time.minute.toString().padLeft(2, '0');
+    String ampm = time.hour >= 12 ? 'PM' : 'AM';
+    return '$hr.$min $ampm';
+  }
 
   @override
   Widget build(BuildContext context) => GridView.count(
@@ -158,12 +170,15 @@ class DetailInfoGrid extends StatelessWidget {
     physics: const NeverScrollableScrollPhysics(),
     crossAxisSpacing: 16,
     mainAxisSpacing: 16,
-    childAspectRatio: 1.4, // Mengatur agar kotaknya sedikit melebar kesamping
-    children: const [
-      _InfoCard(label: 'Dosage/day:', value: '1 capsule'),
-      _InfoCard(label: 'Time to take:', value: '10.05 AM'),
-      _InfoCard(label: 'Total dosage:', value: '400 mg'),
-      _InfoCard(label: 'Instruction:', value: 'After meal'),
+    childAspectRatio: 1.4,
+    children: [
+      _InfoCard(label: 'Dosage/day:', value: medicine.quantity),
+      _InfoCard(label: 'Time to take:', value: _formatTime(medicine.time)),
+      _InfoCard(label: 'Total dosage:', value: medicine.totalDosage),
+      _InfoCard(
+        label: 'Instruction:',
+        value: medicine.isMeal ? 'After meal' : 'Before meal',
+      ),
     ],
   );
 }
@@ -204,7 +219,7 @@ class _InfoCard extends StatelessWidget {
         Text(
           value,
           style: GoogleFonts.plusJakartaSans(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppTheme.textPrimary,
             letterSpacing: -0.5,

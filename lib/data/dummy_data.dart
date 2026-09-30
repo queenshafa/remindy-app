@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../models/medicine.dart';
 
 class DummyUser {
@@ -6,37 +7,65 @@ class DummyUser {
   static const String name = 'Nari';
 }
 
-final List<Medicine> dummyMedicines = [
+final ValueNotifier<String> globalUserNameNotifier = ValueNotifier('Nari');
+final ValueNotifier<String> globalFamilyNumberNotifier = ValueNotifier('+62');
+
+// 👉 GLOBAL STATE: Untuk mendeteksi kalender sedang ada di hari apa
+final ValueNotifier<DateTime> globalSelectedDateNotifier = ValueNotifier(
+  DateTime.now(),
+);
+
+final ValueNotifier<List<Medicine>> globalMedicinesNotifier = ValueNotifier([
   Medicine(
     id: 'm1',
     title: 'Rifampisin',
-    quantity: '10mg',
+    latinName: 'Rifampicinum',
+    type: 'Capsule',
+    quantity: '1 capsule',
+    totalDosage: '150 mg',
+    remain: 20,
     time: DateTime(2026, 9, 28, 9, 0),
-    isMeal: true, // After meal
+    isMeal: true,
     category: 'Morning',
+    imageUrl:
+        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1000&auto=format&fit=crop',
   ),
   Medicine(
     id: 'm2',
     title: 'Paracetamol',
-    quantity: '500mg',
+    latinName: 'Acetaminophen',
+    type: 'Tablet',
+    quantity: '1 tablet',
+    totalDosage: '500 mg',
+    remain: 12,
     time: DateTime(2026, 9, 28, 13, 0),
-    isMeal: false, // Before meal
+    isMeal: false,
     category: 'Afternoon',
+    imageUrl:
+        'https://images.unsplash.com/photo-1628771065518-0d82f1938462?q=80&w=1000&auto=format&fit=crop',
   ),
-  Medicine(
-    id: 'm3',
-    title: 'Amoxicillin',
-    quantity: '250mg',
-    time: DateTime(2026, 9, 28, 18, 30),
-    isMeal: true,
-    category: 'Evening',
-  ),
-  Medicine(
-    id: 'm4',
-    title: 'Vitamin C',
-    quantity: '1000mg',
-    time: DateTime(2026, 9, 28, 21, 0),
-    isMeal: true,
-    category: 'Night',
-  ),
-];
+]);
+
+void addMedicine(Medicine newMedicine) {
+  final updatedList = List<Medicine>.from(globalMedicinesNotifier.value)
+    ..add(newMedicine);
+  globalMedicinesNotifier.value = updatedList;
+}
+
+// 👉 MENCATAT TANGGAL SAAT OBAT DIMINUM
+void markMedicineAsConsumed(String id, DateTime date) {
+  String dateStr =
+      "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+  final currentList = globalMedicinesNotifier.value;
+  globalMedicinesNotifier.value = currentList.map((med) {
+    if (med.id == id) {
+      final newConsumedDates = List<String>.from(med.consumedDates);
+      if (!newConsumedDates.contains(dateStr)) {
+        newConsumedDates.add(dateStr); // Simpan tanggal minumnya
+      }
+      return med.copyWith(consumedDates: newConsumedDates);
+    }
+    return med;
+  }).toList();
+}

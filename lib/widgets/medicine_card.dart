@@ -11,14 +11,18 @@ class MedicineCard extends StatelessWidget {
     required this.time,
     required this.isMeal,
     this.category = 'Morning',
+    this.onConsume,
+    this.historyStatus, // <-- Tambahan parameter untuk Track Screen ('done' atau 'miss')
   });
 
   final String title;
   final String quantity;
   final VoidCallback onTap;
+  final VoidCallback? onConsume;
   final DateTime time;
   final bool isMeal;
   final String category;
+  final String? historyStatus; // <-- Bisa null, 'done', atau 'miss'
 
   @override
   Widget build(BuildContext context) {
@@ -32,104 +36,148 @@ class MedicineCard extends StatelessWidget {
           child: Material(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        // Time Chip
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // Time Chip
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7E7D7A),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              formattedTime,
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // isMeal Chip
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7E7D7A),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isMeal ? 'After meal' : 'Before meal',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                           ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF7E7D7A),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // Meds Information (Title & Quantity)
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onTap,
+                          behavior: HitTestBehavior.opaque,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
+                              Text(
+                                title,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.primary,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(height: 2),
                               Text(
-                                formattedTime,
+                                quantity,
                                 style: GoogleFonts.plusJakartaSans(
-                                  color: Colors.white,
-                                  fontSize: 13,
+                                  fontSize: 14,
+                                  color: AppTheme.textSecondary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
+                      ),
 
-                        // isMeal Chip
+                      // 👉 RENDER BADGE DONE / MISS JIKA ADA STATUS DARI TRACK SCREEN
+                      if (historyStatus == 'done' || historyStatus == 'miss')
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
+                            horizontal: 10,
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF7E7D7A),
+                            color: historyStatus == 'done'
+                                ? const Color(0xFF00C853) // Hijau Done
+                                : AppTheme.primary, // Merah Miss
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(
-                            isMeal ? 'After meal' : 'Before meal',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 14,
+                                height: 14,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                historyStatus == 'done' ? 'Done' : 'Miss',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        // Meds Information (Title & Quantity)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              quantity,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 14,
-                                color: AppTheme.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Consume Btn
+                        )
+                      // 👉 KALAU TIDAK ADA STATUS HISTORY, RENDER TOMBOL CONSUME BIASA
+                      else if (onConsume != null)
                         GestureDetector(
-                          onTap: onTap,
+                          onTap: onConsume,
+                          behavior: HitTestBehavior.opaque,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 18,
@@ -149,10 +197,9 @@ class MedicineCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -169,7 +216,6 @@ class MedicineCard extends StatelessWidget {
           ),
           child: Center(
             child: RotatedBox(
-              // Turn texts vertical
               quarterTurns: 1,
               child: Text(
                 category,

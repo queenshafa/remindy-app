@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:remindy_app/theme/app_theme.dart';
+import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/widgets/meds_detail_components.dart';
 
 class MedsDetailScreen extends StatelessWidget {
-  // Kita bisa menggunakan dummyBanners[0].imageUrl dari data lama kamu
-  final String imageUrl;
+  final Medicine medicine;
 
-  const MedsDetailScreen({
-    super.key,
-    this.imageUrl =
-        'https://img.pikbest.com/origin/09/17/05/62EpIkbEsTQ8w.jpg!bw800', // Default fallback image
-  });
+  const MedsDetailScreen({super.key, required this.medicine});
 
   @override
   Widget build(BuildContext context) {
@@ -24,32 +20,31 @@ class MedsDetailScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 16),
 
-              // 1. Header (Back & Edit)
               const DetailHeader(),
               const SizedBox(height: 24),
 
-              // 2. Banner Foto Obat
-              DetailImageBanner(imageUrl: imageUrl),
+              // 1. Banner beda-beda dari URL obat
+              DetailImageBanner(imageUrl: medicine.imageUrl),
               const SizedBox(height: 24),
 
-              // 3. Judul Utama
-              const DetailTitleSection(
-                title: 'Pyrazinamide',
-                subtitle: 'Pyrazinamidum',
-                type: 'Tablet',
+              // 2. Info Judul (Nama, Latin, dan Tipe)
+              DetailTitleSection(
+                title: medicine.title,
+                subtitle: medicine.latinName,
+                type: medicine.type,
               ),
               const SizedBox(height: 16),
 
-              // 4. Chip Sisa Obat
-              const DetailRemainChip(remainText: '15 Tablet Remain'),
+              // 3. Info Sisa obat
+              DetailRemainChip(
+                remainText: '${medicine.remain} ${medicine.type} Remain',
+              ),
               const SizedBox(height: 32),
 
-              // 5. Grid Info Kotak-Kotak Putih
-              const DetailInfoGrid(),
+              // 4. Grid Kotak Informasi Dinamis
+              DetailInfoGrid(medicine: medicine),
 
-              const SizedBox(
-                height: 120,
-              ), // Memberi ruang lega untuk Floating Navbar
+              const SizedBox(height: 120),
             ],
           ),
         ),

@@ -59,7 +59,7 @@ class _AddMedsScanScreenState extends State<AddMedsScanScreen> {
                       margin: const EdgeInsets.only(bottom: 40),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
@@ -77,7 +77,7 @@ class _AddMedsScanScreenState extends State<AddMedsScanScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primary.withOpacity(0.3),
+                              color: AppTheme.primary.withValues(alpha: 0.3),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),

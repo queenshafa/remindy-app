@@ -13,10 +13,6 @@ class MedsScreen extends StatefulWidget {
 }
 
 class _MedsScreenState extends State<MedsScreen> {
-  // Simulasi data obat yang belum dimakan dan sudah dimakan
-  final List<Medicine> medsToTake = dummyMedicines.take(2).toList();
-  final List<Medicine> medsTaken = dummyMedicines.skip(2).take(1).toList();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,27 +21,54 @@ class _MedsScreenState extends State<MedsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const MedsHeader(), // <-- Header Merah dipanggil di sini
+            const MedsHeader(),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
+            // Dengarkan perubahan pada Kalender
+            ValueListenableBuilder<DateTime>(
+              valueListenable: globalSelectedDateNotifier,
+              builder: (context, selectedDate, child) {
+                // Dengarkan perubahan pada List Obat
+                return ValueListenableBuilder<List<Medicine>>(
+                  valueListenable: globalMedicinesNotifier,
+                  builder: (context, allMedicines, child) {
+                    // Filter: Belum diminum DI TANGGAL YANG DIPILIH
+                    final medsToTake = allMedicines
+                        .where((m) => !m.isConsumedOn(selectedDate))
+                        .toList();
 
-                  // <-- Section: Meds to Take
-                  MedsListSection(title: 'Meds to Take', medicines: medsToTake),
+                    // Filter: Sudah diminum DI TANGGAL YANG DIPILIH
+                    final medsTaken = allMedicines
+                        .where((m) => m.isConsumedOn(selectedDate))
+                        .toList();
 
-                  const SizedBox(height: 16),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 24),
 
-                  // <-- Section: Meds Taken
-                  MedsListSection(title: 'Meds Taken', medicines: medsTaken),
+                          MedsListSection(
+                            title: 'Meds to Take',
+                            medicines: medsToTake,
+                            isCompletedSection: false, // Tombol AKTIF
+                          ),
 
-                  // Jarak aman untuk floating navbar
-                  const SizedBox(height: 120),
-                ],
-              ),
+                          const SizedBox(height: 16),
+
+                          MedsListSection(
+                            title: 'Meds Taken',
+                            medicines: medsTaken,
+                            isCompletedSection: true, // Tombol HILANG
+                          ),
+
+                          const SizedBox(height: 120),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),

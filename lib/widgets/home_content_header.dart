@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:remindy_app/data/dummy_data.dart';
+import 'package:remindy_app/screen/notification_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/widgets/button_banner.dart';
 import 'package:remindy_app/widgets/circle_icon_button.dart';
@@ -15,13 +17,18 @@ class HomeContentHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                'G\'day, User!',
-                style: TextStyle(
-                  fontSize: 36,
-                  color: AppTheme.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
+              ValueListenableBuilder<String>(
+                valueListenable: globalUserNameNotifier,
+                builder: (context, userName, child) {
+                  return Text(
+                    'G\'day, $userName!',
+                    style: TextStyle(
+                      fontSize: 36,
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+                },
               ),
               Spacer(),
               Row(
@@ -30,7 +37,14 @@ class HomeContentHeader extends StatelessWidget {
                   SizedBox(width: 10),
                   CircleIconButton(
                     icon: Icons.notifications_outlined,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

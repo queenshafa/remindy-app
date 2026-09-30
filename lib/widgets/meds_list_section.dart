@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/models/medicine.dart';
+import 'package:remindy_app/screen/meds_detail_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
+import 'package:remindy_app/widgets/consume_bottom_sheet.dart';
 import 'package:remindy_app/widgets/medicine_card.dart';
 
 class MedsListSection extends StatelessWidget {
   final String title;
   final List<Medicine> medicines;
+  final bool isCompletedSection; // <-- Penanda apakah ini daftar Meds Taken
 
   const MedsListSection({
     super.key,
     required this.title,
     required this.medicines,
+    this.isCompletedSection = false, // Default: false (ada tombolnya)
   });
 
   @override
@@ -38,7 +42,22 @@ class MedsListSection extends StatelessWidget {
               time: med.time,
               isMeal: med.isMeal,
               category: med.category,
-              onTap: () {},
+
+              // 👉 HILANGKAN TOMBOL JIKA BERADA DI MEDS TAKEN
+              onConsume: isCompletedSection
+                  ? null
+                  : () {
+                      ConsumeBottomSheet.show(context, med.id);
+                    },
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MedsDetailScreen(medicine: med),
+                  ),
+                );
+              },
             ),
           ),
         ),
