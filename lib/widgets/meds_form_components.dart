@@ -23,30 +23,55 @@ class MedsLabel extends StatelessWidget {
 class MedsTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
+
   const MedsTextField({
     super.key,
     required this.controller,
     required this.hint,
   });
+
   @override
-  Widget build(BuildContext context) => Container(
-    height: 56,
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: TextField(
+  Widget build(BuildContext context) {
+    return TextField(
       controller: controller,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppTheme.textPrimary, // Pastikan ini warna teks utamamu
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        border: InputBorder.none,
-        filled: false,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        hintStyle: TextStyle(color: Colors.grey.shade400),
+        hintStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 14,
+          color: Colors.grey.shade400,
+        ),
+        filled: true,
+        fillColor: Colors.white, // Background putih langsung dari TextField-nya
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        // Border saat diam (tanpa garis)
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        // Border utama (tanpa garis)
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        // Border saat diklik/fokus (garis merah rapi mengikuti bentuk kotak)
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(
+            color: AppTheme.primary, // Garis merah rapi dari tema kamu
+            width: 1.5,
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class MedsDosageField extends StatelessWidget {

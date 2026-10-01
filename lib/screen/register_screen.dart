@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Please fill your name and family phone number',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),

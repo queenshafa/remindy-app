@@ -3,7 +3,7 @@ import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/screen/meds_detail_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
-import 'package:remindy_app/widgets/consume_bottom_sheet.dart'; // <-- Pastikan ini diimport!
+import 'package:remindy_app/widgets/consume_bottom_sheet.dart';
 import 'package:remindy_app/widgets/home_content_header.dart';
 import 'package:remindy_app/widgets/medicine_card.dart';
 
@@ -15,24 +15,30 @@ class HomeScreen extends StatelessWidget {
     return ValueListenableBuilder<List<Medicine>>(
       valueListenable: globalMedicinesNotifier,
       builder: (context, medicines, child) {
-        // KITA FILTER DI SINI: Home HANYA menampilkan obat yang "pending" (belum diminum)
-        // Ganti baris filter medicines.where yang lama dengan ini:
+        // 👇 FILTER BARU: Belum Diminum HARI INI & Masuk Jadwal HARI INI 👇
+        final DateTime today = DateTime.now();
         final pendingMedicines = medicines
-            .where((m) => !m.isConsumedOn(DateTime.now()))
+            .where(
+              (m) =>
+                  !m.isConsumedOn(today) &&
+                  m.isScheduledForDate(
+                    today,
+                  ), // Cek intervalnya masuk ke hari ini nggak
+            )
             .toList();
+        // 👆 SELESAI 👆
 
         return SafeArea(
           child: CustomScrollView(
             slivers: [
               const SliverToBoxAdapter(child: HomeContentHeader()),
 
-              // Cek apakah data PENDING kosong (bukan ngecek medicines keseluruhan)
               if (pendingMedicines.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                     child: Text(
-                      'No medications scheduled',
+                      'No medications scheduled for today',
                       style: TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 16,
@@ -45,8 +51,7 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final medicine =
-                          pendingMedicines[index]; // Gunakan data yang sudah difilter!
+                      final medicine = pendingMedicines[index];
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 14),
@@ -57,7 +62,6 @@ class HomeScreen extends StatelessWidget {
                           isMeal: medicine.isMeal,
                           category: medicine.category,
                           onConsume: () {
-                            // Ini yang manggil sheet-nya
                             ConsumeBottomSheet.show(context, medicine.id);
                           },
                           onTap: () {

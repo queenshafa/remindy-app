@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:remindy_app/screen/onboarding_screen.dart';
-import 'package:remindy_app/screen/register_screen.dart';
+import 'package:remindy_app/screen/splash_screen.dart';
+import 'package:remindy_app/screen/subscribe_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 
 void main() {
@@ -14,9 +14,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Remindy App',
       theme: AppTheme.theme,
-      home: RegisterScreen(),
+      home: SubscribeScreen(),
     );
   }
 }

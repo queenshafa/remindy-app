@@ -23,23 +23,33 @@ class _MedsScreenState extends State<MedsScreen> {
           children: [
             const MedsHeader(),
 
-            // Dengarkan perubahan pada Kalender
             ValueListenableBuilder<DateTime>(
               valueListenable: globalSelectedDateNotifier,
               builder: (context, selectedDate, child) {
-                // Dengarkan perubahan pada List Obat
                 return ValueListenableBuilder<List<Medicine>>(
                   valueListenable: globalMedicinesNotifier,
                   builder: (context, allMedicines, child) {
-                    // Filter: Belum diminum DI TANGGAL YANG DIPILIH
+                    // 👇 FILTER BARU: Cek Consumed & Cek Jadwal (Interval) 👇
                     final medsToTake = allMedicines
-                        .where((m) => !m.isConsumedOn(selectedDate))
+                        .where(
+                          (m) =>
+                              !m.isConsumedOn(selectedDate) &&
+                              m.isScheduledForDate(
+                                selectedDate,
+                              ), // Cek Intervalnya di sini!
+                        )
                         .toList();
 
-                    // Filter: Sudah diminum DI TANGGAL YANG DIPILIH
                     final medsTaken = allMedicines
-                        .where((m) => m.isConsumedOn(selectedDate))
+                        .where(
+                          (m) =>
+                              m.isConsumedOn(selectedDate) &&
+                              m.isScheduledForDate(
+                                selectedDate,
+                              ), // Cek Intervalnya di sini!
+                        )
                         .toList();
+                    // 👆 SELESAI 👇
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -47,21 +57,17 @@ class _MedsScreenState extends State<MedsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 24),
-
                           MedsListSection(
                             title: 'Meds to Take',
                             medicines: medsToTake,
-                            isCompletedSection: false, // Tombol AKTIF
+                            isCompletedSection: false,
                           ),
-
                           const SizedBox(height: 16),
-
                           MedsListSection(
                             title: 'Meds Taken',
                             medicines: medsTaken,
-                            isCompletedSection: true, // Tombol HILANG
+                            isCompletedSection: true,
                           ),
-
                           const SizedBox(height: 120),
                         ],
                       ),

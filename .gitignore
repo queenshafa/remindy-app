@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# GoWA Server
+gowa_server/node_modules/
+gowa_server/.wwebjs_auth/
+gowa_server/.wwebjs_cache/

@@ -2,40 +2,50 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class WhatsAppService {
-  // 👉 Ganti URL ini dengan endpoint API GoWA milikmu!
-  static const String baseUrl = 'http://URL_SERVER_GOWA_KAMU/send/text';
+  // GANTI IP INI DENGAN IP LOKAL MAC KAMU (misal: 192.168.1.5)
+  // JANGAN gunakan localhost kalau kamu ngetest pakai HP beneran (kabel data)
+  static const String baseUrl =
+      'http://127.0.0.1:3000/send/text'; // <-- Coba ubah ke 127.0.0.1 dulu
 
   static Future<void> sendNotification({
     required String phoneNumber,
     required String medicineName,
     required String status,
   }) async {
+    print('🚀 Flutter mencoba kirim ke: $baseUrl');
+    print('📦 Data: Nomor=$phoneNumber, Obat=$medicineName');
+
     try {
-      // GoWA biasanya butuh nomor dalam format angka saja (misal: 62812xxx)
       String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
 
-      // Susun pesan otomatisnya
+      // Validasi nomor Indonesia (pastikan depannya 62, bukan 0 atau 620)
+      if (cleanPhone.startsWith('0')) {
+        cleanPhone = '62${cleanPhone.substring(1)}';
+      } else if (!cleanPhone.startsWith('62')) {
+        cleanPhone = '62$cleanPhone';
+      }
+
       String message =
           "Halo! Menginformasikan bahwa obat *$medicineName* saat ini berstatus: *$status*.\n\n- Notifikasi otomatis dari Remindy.";
 
+      print('🔄 Mengirim request ke server Node.js...');
+
       final response = await http.post(
         Uri.parse(baseUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer TOKEN_KAMU', // Buka baris ini jika GoWA kamu diproteksi token
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"msisdn": cleanPhone, "message": message}),
       );
 
+      print('📥 Response dari Server: Status Code = ${response.statusCode}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('✅ Notifikasi WhatsApp berhasil terkirim ke $cleanPhone');
+        print('✅ BERHASIL! Notifikasi WhatsApp terkirim ke $cleanPhone');
       } else {
-        print(
-          '❌ Gagal mengirim WA. Status: ${response.statusCode}, Body: ${response.body}',
-        );
+        print('❌ GAGAL DARI SERVER. Body: ${response.body}');
       }
     } catch (e) {
-      print('⚠️ Error saat menghubungi GoWA: $e');
+      print('⚠️ ERROR JARINGAN: $e');
+      print('Pastikan alamat IP Server (baseUrl) benar dan server nyala.');
     }
   }
 }

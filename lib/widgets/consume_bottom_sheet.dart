@@ -62,22 +62,23 @@ class ConsumeBottomSheet extends StatelessWidget {
                   globalSelectedDateNotifier.value,
                 );
 
-                // 2. Cari detail obat berdasarkan ID untuk mengambil judulnya
+                // 2. Ambil detail obat untuk nama pesan WA
                 final currentMedicines = globalMedicinesNotifier.value;
                 final takenMed = currentMedicines.firstWhere(
                   (m) => m.id == medicineId,
                 );
 
-                // 3. Eksekusi pengiriman WhatsApp ke nomor keluarga di background!
+                // 3. Kirim WA ke nomor keluarga (contoh: '6281234567890')
                 WhatsAppService.sendNotification(
-                  phoneNumber: globalFamilyNumberNotifier.value,
+                  phoneNumber: globalFamilyNumberNotifier
+                      .value, // Pastikan ini terisi nomor valid
                   medicineName: takenMed.title,
                   status: 'SUDAH DIMINUM ✅',
                 );
 
-                // 4. Tutup bottom sheet
                 Navigator.pop(context);
               },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 shape: RoundedRectangleBorder(

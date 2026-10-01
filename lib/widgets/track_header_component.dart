@@ -28,14 +28,6 @@ class HistoryTitle extends StatelessWidget {
               backgroundColor: Colors.white,
               child: Icon(Icons.settings_outlined, color: Colors.grey.shade800),
             ),
-            const SizedBox(width: 8),
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.notifications_none,
-                color: Colors.grey.shade800,
-              ),
-            ),
           ],
         ),
       ],

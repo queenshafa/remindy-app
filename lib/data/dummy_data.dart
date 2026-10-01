@@ -8,7 +8,9 @@ class DummyUser {
 }
 
 final ValueNotifier<String> globalUserNameNotifier = ValueNotifier('Nari');
-final ValueNotifier<String> globalFamilyNumberNotifier = ValueNotifier('+62');
+final ValueNotifier<String> globalFamilyNumberNotifier = ValueNotifier(
+  '+6285210719896',
+);
 
 // 👉 GLOBAL STATE: Untuk mendeteksi kalender sedang ada di hari apa
 final ValueNotifier<DateTime> globalSelectedDateNotifier = ValueNotifier(

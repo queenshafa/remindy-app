@@ -22,18 +22,51 @@ class _HistoryScreenState extends State<TrackScreen> {
     DateTime now = DateTime.now();
     List<Medicine> historyList = [];
 
-    // Tentukan seberapa jauh ke belakang kita membuat riwayat
-    int daysToGenerate = 30; // Default All Time: 30 hari ke belakang
-    if (_selectedFilter == 'Last week') daysToGenerate = 7;
-    if (_selectedFilter == 'Last month') daysToGenerate = 30;
-    if (_selectedFilter == 'By year') daysToGenerate = 365;
+    // Tentukan BATAS AWAL dan BATAS AKHIR (Hari ini)
+    DateTime startDate;
+    DateTime endDate = now; // Secara default, batas akhirnya adalah hari ini
 
-    // Kita generate jadwal dari HARI INI (i=0) mundur sampai (daysToGenerate) hari
+    if (_selectedFilter == 'Last week') {
+      // Menampilkan jadwal dari 7 hari yang lalu sampai HARI INI
+      startDate = now.subtract(const Duration(days: 7));
+    } else if (_selectedFilter == 'Last month') {
+      // 🔴 PERBAIKAN: Menampilkan HANYA bulan kemarin (Full 1 bulan) 🔴
+      int lastMonth = now.month - 1;
+      int yearOfLastMonth = now.year;
+
+      if (lastMonth == 0) {
+        // Jika sekarang Januari, maka bulan lalu adalah Desember tahun sebelumnya
+        lastMonth = 12;
+        yearOfLastMonth--;
+      }
+
+      // Mulai dari tanggal 1 bulan lalu
+      startDate = DateTime(yearOfLastMonth, lastMonth, 1);
+
+      // Berakhir di hari terakhir bulan lalu (yaitu tanggal 0 dari bulan sekarang)
+      endDate = DateTime(now.year, now.month, 0);
+    } else if (_selectedFilter == 'By year') {
+      // Menampilkan HANYA tahun ini (dari 1 Januari sampai hari ini)
+      startDate = DateTime(now.year, 1, 1);
+    } else {
+      // All Time (Mundur 3 tahun dari hari ini)
+      startDate = now.subtract(const Duration(days: 1095));
+    }
+
+    // Hitung total hari antara startDate dan endDate
+    int daysToGenerate =
+        endDate.difference(startDate).inDays +
+        1; // +1 biar hari terakhir ikut kehitung
+
+    // Kita generate jadwal dari endDate (i=0) mundur sampai startDate
     for (int i = 0; i < daysToGenerate; i++) {
-      DateTime targetDate = now.subtract(Duration(days: i));
+      DateTime targetDate = endDate.subtract(Duration(days: i));
 
       for (var med in allData) {
-        // Buat instance obat virtual khusus untuk tanggal target ini
+        if (!med.isScheduledForDate(targetDate)) {
+          continue;
+        }
+
         DateTime historicalTime = DateTime(
           targetDate.year,
           targetDate.month,
@@ -42,23 +75,19 @@ class _HistoryScreenState extends State<TrackScreen> {
           med.time.minute,
         );
 
-        // Kloning data obatnya dengan tanggal riwayat
         Medicine virtualMed = med.copyWith(time: historicalTime);
 
-        // 1. Logika Search Teks (Cari Nama / Tahun)
         final queryLower = _searchQuery.toLowerCase();
         final matchesSearch =
             virtualMed.title.toLowerCase().contains(queryLower) ||
             virtualMed.time.year.toString().contains(queryLower);
 
-        // Jika lolos search, masukkan ke daftar history
         if (matchesSearch) {
           historyList.add(virtualMed);
         }
       }
     }
 
-    // Urutkan dari yang terbaru (tanggal & jam) ke yang paling lama
     historyList.sort((a, b) => b.time.compareTo(a.time));
 
     return historyList;
@@ -141,8 +170,7 @@ class _HistoryScreenState extends State<TrackScreen> {
                       // 1. Cek apakah Header Tanggal perlu dimunculkan
                       bool showDateHeader = false;
                       if (index == 0) {
-                        showDateHeader =
-                            true; // Item pertama pasti munculin header tanggal
+                        showDateHeader = true;
                       } else {
                         final prevMed = filteredMeds[index - 1];
                         // Jika tanggal berbeda dari card sebelumnya, munculin header lagi
@@ -157,9 +185,7 @@ class _HistoryScreenState extends State<TrackScreen> {
                           "${med.time.day}, ${_getMonthName(med.time.month)}, ${med.time.year}.";
 
                       // 2. Tentukan status riwayat obat (Done / Miss)
-                      final isDone = med.isConsumedOn(
-                        med.time,
-                      ); // Ngecek sesuai tanggal history card-nya
+                      final isDone = med.isConsumedOn(med.time);
                       final isMiss = !isDone && now.isAfter(med.time);
 
                       String? currentHistoryStatus;
@@ -168,7 +194,6 @@ class _HistoryScreenState extends State<TrackScreen> {
                       } else if (isMiss) {
                         currentHistoryStatus = 'miss';
                       }
-                      // Jika belum waktunya (masih di masa depan / jamnya belum lewat), biarkan null
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

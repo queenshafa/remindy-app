@@ -3,24 +3,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/theme/app_theme.dart';
-import 'package:remindy_app/widgets/add_meds_header.dart';
 import 'package:remindy_app/widgets/meds_form_components.dart';
 
-class AddMedsManualScreen extends StatefulWidget {
-  const AddMedsManualScreen({super.key});
+class EditMedsScreen extends StatefulWidget {
+  final Medicine medicine;
+  const EditMedsScreen({super.key, required this.medicine});
 
   @override
-  State<AddMedsManualScreen> createState() => _AddMedsManualScreenState();
+  State<EditMedsScreen> createState() => _EditMedsScreenState();
 }
 
-class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
+class _EditMedsScreenState extends State<EditMedsScreen> {
   final _nameCtrl = TextEditingController();
   final _remainCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
-
   final _dosisAngkaCtrl = TextEditingController();
   final _lamaKonsumsiAngkaCtrl = TextEditingController();
-
   final _hourCtrl = TextEditingController();
   final _minuteCtrl = TextEditingController();
 
@@ -33,11 +31,58 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
   @override
   void initState() {
     super.initState();
-    _hourCtrl.text = '00';
-    _minuteCtrl.text = '00';
-    _remainCtrl.text = '0';
-    _dosisAngkaCtrl.text = '1';
-    _lamaKonsumsiAngkaCtrl.text = '1';
+    final med = widget.medicine;
+
+    // Isi data text field bawaan
+    _nameCtrl.text = med.title;
+    _remainCtrl.text = med.remain.toString();
+    _notesCtrl.text = med.catatan ?? '';
+    _hourCtrl.text = med.time.hour.toString().padLeft(2, '0');
+    _minuteCtrl.text = med.time.minute.toString().padLeft(2, '0');
+
+    // Parse Data Dosis (contoh: "2 Kapsul" -> "2", "Kapsul")
+    final dosisParts = (med.dosisLengkap ?? '1 Tablet').split(' ');
+    _dosisAngkaCtrl.text = dosisParts.isNotEmpty ? dosisParts[0] : '1';
+    final parsedDosisSatuan = dosisParts.length > 1 ? dosisParts[1] : 'Tablet';
+    if ([
+      'Supositoria',
+      'Tablet',
+      'Tetes',
+      'Kaplet',
+      'Kapsul',
+      'Pil',
+      'Semprotan',
+    ].contains(parsedDosisSatuan)) {
+      _dosisSatuan = parsedDosisSatuan;
+    }
+
+    // Parse Data Lama Konsumsi (contoh: "10 minggu" -> "10", "minggu")
+    final lamaParts = (med.lamaKonsumsi ?? '1 hari').split(' ');
+    _lamaKonsumsiAngkaCtrl.text = lamaParts.isNotEmpty ? lamaParts[0] : '1';
+    final parsedLamaSatuan = lamaParts.length > 1 ? lamaParts[1] : 'hari';
+    if (['hari', 'minggu', 'bulan', 'tahun'].contains(parsedLamaSatuan)) {
+      _lamaKonsumsiSatuan = parsedLamaSatuan;
+    }
+
+    // Parse Data Periode & Frekuensi
+    if (['Setiap Hari', 'Hari Pilihan'].contains(med.periodeMinum)) {
+      _periodeMinum = med.periodeMinum!;
+    }
+
+    final freqParts = (med.quantity).split(' ');
+    if (['1', '2', '3', '4', '5'].contains(freqParts[0])) {
+      _frekuensi = freqParts[0];
+    }
+
+    if ([
+      'Sebelum tidur',
+      'Setelah makan',
+      'Sebelum makan',
+      'Setelah bangun tidur',
+      'Saat Makan',
+    ].contains(med.totalDosage)) {
+      _aturanMinum = med.totalDosage;
+    }
   }
 
   @override
@@ -85,9 +130,9 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
           borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
         ),
       ),
-      items: items.map((String item) {
-        return DropdownMenuItem<String>(value: item, child: Text(item));
-      }).toList(),
+      items: items
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
       onChanged: onChanged,
     );
   }
@@ -103,11 +148,27 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              const AddMedsHeader(),
+              // Custom Header Sederhana
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back, color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 32),
 
               Text(
-                'Manual Fill:',
+                'Edit Medicine:',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
@@ -214,12 +275,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                         const MedsLabel('Periode Minum:'),
                         _buildDropdown(
                           value: _periodeMinum,
-                          items: [
-                            'Setiap Hari',
-                            '2 Hari Sekali',
-                            '3 Hari Sekali',
-                            'Seminggu Sekali',
-                          ],
+                          items: ['Setiap Hari', 'Hari Pilihan'],
                           onChanged: (val) =>
                               setState(() => _periodeMinum = val!),
                         ),
@@ -269,7 +325,6 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
               ),
               const SizedBox(height: 40),
 
-              // TOMBOL SIMPAN
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -287,17 +342,8 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       determinedCategory = 'Evening';
                     }
 
-                    // Logika penentuan interval hari
-                    int interval = 1;
-                    if (_periodeMinum == '2 Hari Sekali') interval = 2;
-                    if (_periodeMinum == '3 Hari Sekali') interval = 3;
-                    if (_periodeMinum == 'Seminggu Sekali') interval = 7;
-
-                    final String newId = DateTime.now().millisecondsSinceEpoch
-                        .toString();
-
-                    final newMeds = Medicine(
-                      id: newId,
+                    final updatedMeds = Medicine(
+                      id: widget.medicine.id, // TETAP GUNAKAN ID LAMA
                       title: _nameCtrl.text.isEmpty
                           ? 'Obat Baru'
                           : _nameCtrl.text,
@@ -315,22 +361,32 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       ),
                       isMeal: _aturanMinum.contains('makan'),
                       category: determinedCategory,
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1584308666744-24d5e4b77f39?q=80&w=1000&auto=format&fit=crop',
+                      imageUrl: widget.medicine.imageUrl,
                       dosisLengkap: '${_dosisAngkaCtrl.text} $_dosisSatuan',
                       lamaKonsumsi:
                           '${_lamaKonsumsiAngkaCtrl.text} $_lamaKonsumsiSatuan',
                       periodeMinum: _periodeMinum,
-                      intervalHari: interval, // Dimasukkan di sini!
                       catatan: _notesCtrl.text,
                     );
 
-                    addMedicine(newMeds);
-                    Navigator.pop(context);
+                    // LOGIKA MENGGANTI DATA LAMA DENGAN YANG BARU
+                    final currentMeds = globalMedicinesNotifier.value;
+                    final index = currentMeds.indexWhere(
+                      (m) => m.id == updatedMeds.id,
+                    );
+                    if (index != -1) {
+                      currentMeds[index] = updatedMeds;
+                      globalMedicinesNotifier.value = List.from(
+                        currentMeds,
+                      ); // Trigger UI Update
+                    }
 
+                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${newMeds.title} berhasil ditambahkan!'),
+                        content: Text(
+                          '${updatedMeds.title} berhasil diperbarui!',
+                        ),
                         backgroundColor: AppTheme.primary,
                       ),
                     );
@@ -343,7 +399,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Add to Schedule',
+                    'Save Changes',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
