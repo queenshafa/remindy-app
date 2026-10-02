@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:remindy_app/data/dummy_data.dart';
+import 'package:remindy_app/screen/main_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/widgets/subs_components.dart';
 
@@ -16,18 +20,21 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
 
+  // Variabel untuk RevenueCat
+  Offerings? _offerings;
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
-    // Listener ini berguna kalau user manual nge-drag sheet ke bawah sampai hilang,
-    // toggle-nya otomatis pindah ke "7-day free trial"
     _sheetController.addListener(() {
       if (_sheetController.size < 0.1 && _isProActive) {
-        setState(() {
-          _isProActive = false;
-        });
+        setState(() => _isProActive = false);
       }
     });
+
+    // Tarik data paket dari RevenueCat saat layar dibuka
+    _fetchOfferings();
   }
 
   @override
@@ -36,21 +43,87 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     super.dispose();
   }
 
-  // Fungsi untuk mengatur Toggle dan animasi Bottom Sheet
+  // --- LOGIKA REVENUE CAT ---
+
+  Future<void> _fetchOfferings() async {
+    try {
+      Offerings offerings = await Purchases.getOfferings();
+      if (offerings.current != null && mounted) {
+        setState(() {
+          _offerings = offerings;
+        });
+      }
+    } on PlatformException catch (e) {
+      debugPrint("Gagal mengambil paket: $e");
+    }
+  }
+
+  Future<void> _processPurchase() async {
+    setState(() => _isLoading = true);
+
+    // Simulasi proses pembayaran hackathon (loading 2 detik)
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Aktifkan status Pro secara instan untuk kebutuhan demo
+    globalIsProNotifier.value = true;
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Welcome to Remindy Pro! 🎉'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context); // Tutup bottom sheet
+    }
+  }
+
+  Future<void> _restorePurchases() async {
+    setState(() => _isLoading = true);
+    try {
+      CustomerInfo customerInfo = await Purchases.restorePurchases();
+      if (customerInfo.entitlements.all["pro"]?.isActive == true) {
+        globalIsProNotifier.value = true;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Subscription Restored!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (mounted)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No active subscription found.')),
+          );
+      }
+    } on PlatformException catch (e) {
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  // --- AKHIR LOGIKA REVENUE CAT ---
+
   void _toggleProState(bool isPro) {
     setState(() {
       _isProActive = isPro;
     });
 
     if (isPro) {
-      // Buka Bottom Sheet sampai 75% layar
       _sheetController.animateTo(
         0.75,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutBack,
       );
     } else {
-      // Sembunyikan Bottom Sheet
       _sheetController.animateTo(
         0.0,
         duration: const Duration(milliseconds: 300),
@@ -59,18 +132,21 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     }
   }
 
+  // Helper untuk mengambil harga asli atau harga fallback
+  String _getPrice(Package? package, String fallbackPrice) {
+    return package?.storeProduct.priceString ?? fallbackPrice;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Stack(
         children: [
-          // ==========================================
-          // LAYER BAWAH (BACKGROUND CONTENT)
-          // ==========================================
+          // ================= BACKGROUND CONTENT =================
           Column(
             children: [
-              // 1. RED HEADER WIDGET (Ditulis langsung agar mudah akses state)
+              // HEADER (Kode persis sama seperti sebelumnya)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
@@ -88,7 +164,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tombol Close (X)
                     InkWell(
                       onTap: () => Navigator.pop(context),
                       child: Container(
@@ -106,11 +181,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Judul Header
                     Text(
                       'Take care of your\nlong term needs.',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         height: 1.2,
@@ -119,7 +193,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    // TOGGLE BUTTON (Pill Switch)
+                    // TOGGLE BUTTON
                     Container(
                       height: 50,
                       decoration: BoxDecoration(
@@ -183,7 +257,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ),
               ),
 
-              // 2. MAIN CONTENT (FEATURES & TRIAL INFO)
+              // MAIN CONTENT
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -194,7 +268,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     children: [
                       const SubsFeaturesList(),
                       const SizedBox(height: 32),
-                      // Sembunyikan Info Trial jika Pro sedang aktif
                       AnimatedOpacity(
                         opacity: _isProActive ? 0.0 : 1.0,
                         duration: const Duration(milliseconds: 200),
@@ -207,7 +280,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ),
               ),
 
-              // 3. START TRIAL BUTTON (Hanya muncul jika tidak di tab Pro)
               if (!_isProActive)
                 Padding(
                   padding: const EdgeInsets.all(24),
@@ -218,7 +290,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Aksi Mulai Trial
+                            _toggleProState(true); // Arahkan ke Pro
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primary,
@@ -250,14 +322,12 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
             ],
           ),
 
-          // ==========================================
-          // LAYER ATAS: DRAGGABLE BOTTOM SHEET (PRICING)
-          // ==========================================
+          // ================= DRAGGABLE SHEET =================
           DraggableScrollableSheet(
             controller: _sheetController,
-            initialChildSize: 0.0, // Mulai dalam keadaan tersembunyi
+            initialChildSize: 0.0,
             minChildSize: 0.0,
-            maxChildSize: 0.85, // Maksimal setinggi 85% layar
+            maxChildSize: 0.85,
             builder: (context, scrollController) {
               return Container(
                 decoration: BoxDecoration(
@@ -280,7 +350,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     vertical: 16,
                   ),
                   children: [
-                    // DRAG HANDLE (Pill Abu-abu Kecil)
                     Center(
                       child: Container(
                         width: 40,
@@ -292,8 +361,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                         ),
                       ),
                     ),
-
-                    // SHEET TITLE
                     Text(
                       'Activate your Remindy Pro',
                       style: GoogleFonts.plusJakartaSans(
@@ -313,41 +380,46 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // PRICING OPTIONS
+                    // HARGA DIAMBIL LANGSUNG DARI REVENUE CAT JIKA ADA
                     SubsPricingCard(
                       title: 'Lifetime',
                       badgeText: 'Best Value',
-                      price: '\$100',
                       duration: '/unlimited',
                       isBestValue: true,
+                      price: _getPrice(_offerings?.current?.lifetime, '\$100'),
                       isSelected: _selectedPlan == 'Lifetime',
                       onTap: () => setState(() => _selectedPlan = 'Lifetime'),
                     ),
                     SubsPricingCard(
                       title: 'Yearly',
                       badgeText: '-25%',
-                      price: '\$50',
                       duration: '/year',
+                      price: _getPrice(_offerings?.current?.annual, '\$50'),
                       isSelected: _selectedPlan == 'Yearly',
                       onTap: () => setState(() => _selectedPlan = 'Yearly'),
                     ),
                     SubsPricingCard(
                       title: 'Monthly',
                       badgeText: '-25%',
-                      price: '\$4',
                       duration: '/month',
+                      price: _getPrice(_offerings?.current?.monthly, '\$4'),
                       isSelected: _selectedPlan == 'Monthly',
                       onTap: () => setState(() => _selectedPlan = 'Monthly'),
                     ),
                     const SizedBox(height: 16),
 
-                    // SUBSCRIBE BUTTON
+                    // TOMBOL BAYAR
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Aksi Pembayaran
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MainScreen(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primary,
@@ -355,22 +427,26 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                             borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                        child: Text(
-                          'Subscribe',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                'Subscribe',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    // LEGAL TEXT
+                    // TOMBOL RESTORE
                     Center(
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: _isLoading ? null : _restorePurchases,
                         child: Text(
                           'Restore Subscription',
                           style: GoogleFonts.plusJakartaSans(

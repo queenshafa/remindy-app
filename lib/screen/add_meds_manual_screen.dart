@@ -25,19 +25,18 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
   final _minuteCtrl = TextEditingController();
 
   String _dosisSatuan = 'Tablet';
-  String _lamaKonsumsiSatuan = 'hari';
-  String _periodeMinum = 'Setiap Hari';
-  String _frekuensi = '1';
-  String _aturanMinum = 'Setelah makan';
+  String _lamaKonsumsiSatuan = 'Days';
+  String _periodeMinum = 'Everyday';
+  String _aturanMinum = 'After meal';
 
   @override
   void initState() {
     super.initState();
-    _hourCtrl.text = '00';
+    _hourCtrl.text = '08';
     _minuteCtrl.text = '00';
-    _remainCtrl.text = '0';
+    _remainCtrl.text = '30';
     _dosisAngkaCtrl.text = '1';
-    _lamaKonsumsiAngkaCtrl.text = '1';
+    _lamaKonsumsiAngkaCtrl.text = '7';
   }
 
   @override
@@ -107,7 +106,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
               const SizedBox(height: 32),
 
               Text(
-                'Manual Fill:',
+                'Manual Fill',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
@@ -116,15 +115,12 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
               ),
               const SizedBox(height: 24),
 
-              const MedsLabel('Nama Obat:'),
-              MedsTextField(
-                controller: _nameCtrl,
-                hint: 'Contoh: Paracetamol...',
-              ),
+              const MedsLabel('Medicine Name:'),
+              MedsTextField(controller: _nameCtrl, hint: 'e.g. Paracetamol'),
               const SizedBox(height: 20),
 
-              const MedsLabel('Sisa Stok Obat (Botol/Strip):'),
-              MedsTextField(controller: _remainCtrl, hint: 'Contoh: 30'),
+              const MedsLabel('Remaining Stock (Bottles/Strips):'),
+              MedsTextField(controller: _remainCtrl, hint: 'e.g. 30'),
               const SizedBox(height: 24),
 
               Row(
@@ -134,11 +130,8 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Dosis:'),
-                        MedsTextField(
-                          controller: _dosisAngkaCtrl,
-                          hint: 'Ex: 1',
-                        ),
+                        const MedsLabel('Dosage:'),
+                        MedsTextField(controller: _dosisAngkaCtrl, hint: '1'),
                       ],
                     ),
                   ),
@@ -148,17 +141,17 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Satuan:'),
+                        const MedsLabel('Unit:'),
                         _buildDropdown(
                           value: _dosisSatuan,
                           items: [
-                            'Supositoria',
+                            'Suppository',
                             'Tablet',
-                            'Tetes',
-                            'Kaplet',
-                            'Kapsul',
-                            'Pil',
-                            'Semprotan',
+                            'Drops',
+                            'Caplet',
+                            'Capsule',
+                            'Pill',
+                            'Spray',
                           ],
                           onChanged: (val) =>
                               setState(() => _dosisSatuan = val!),
@@ -177,10 +170,10 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Lama Konsumsi:'),
+                        const MedsLabel('Duration:'),
                         MedsTextField(
                           controller: _lamaKonsumsiAngkaCtrl,
-                          hint: 'Ex: 3',
+                          hint: '3',
                         ),
                       ],
                     ),
@@ -191,10 +184,10 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Waktu:'),
+                        const MedsLabel('Period Unit:'),
                         _buildDropdown(
                           value: _lamaKonsumsiSatuan,
-                          items: ['hari', 'minggu', 'bulan', 'tahun'],
+                          items: ['Days', 'Weeks', 'Months', 'Years'],
                           onChanged: (val) =>
                               setState(() => _lamaKonsumsiSatuan = val!),
                         ),
@@ -205,68 +198,39 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
               ),
               const SizedBox(height: 20),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const MedsLabel('Periode Minum:'),
-                        _buildDropdown(
-                          value: _periodeMinum,
-                          items: [
-                            'Setiap Hari',
-                            '2 Hari Sekali',
-                            '3 Hari Sekali',
-                            'Seminggu Sekali',
-                          ],
-                          onChanged: (val) =>
-                              setState(() => _periodeMinum = val!),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const MedsLabel('Berapa Kali Sehari:'),
-                        _buildDropdown(
-                          value: _frekuensi,
-                          items: ['1', '2', '3', '4', '5'],
-                          onChanged: (val) => setState(() => _frekuensi = val!),
-                        ),
-                      ],
-                    ),
-                  ),
+              const MedsLabel('Drinking Frequency / Interval:'),
+              _buildDropdown(
+                value: _periodeMinum,
+                items: [
+                  'Everyday',
+                  'Every 2 Days',
+                  'Every 3 Days',
+                  'Once a Week',
                 ],
+                onChanged: (val) => setState(() => _periodeMinum = val!),
               ),
               const SizedBox(height: 20),
 
-              const MedsLabel('Aturan Minum:'),
+              const MedsLabel('Instruction:'),
               _buildDropdown(
                 value: _aturanMinum,
                 items: [
-                  'Sebelum tidur',
-                  'Setelah makan',
-                  'Sebelum makan',
-                  'Setelah bangun tidur',
-                  'Saat Makan',
+                  'Before bed',
+                  'After meal',
+                  'Before meal',
+                  'After waking up',
+                  'With meal',
                 ],
                 onChanged: (val) => setState(() => _aturanMinum = val!),
               ),
               const SizedBox(height: 20),
 
-              const MedsLabel('Waktu Pengingat (Time to take):'),
+              const MedsLabel('Time to take:'),
               MedsTimeInput(hourCtrl: _hourCtrl, minCtrl: _minuteCtrl),
               const SizedBox(height: 20),
 
-              const MedsLabel('Catatan (Opsional):'),
-              MedsTextField(
-                controller: _notesCtrl,
-                hint: 'Tambahkan catatan jika ada...',
-              ),
+              const MedsLabel('Notes (Optional):'),
+              MedsTextField(controller: _notesCtrl, hint: 'Add notes here...'),
               const SizedBox(height: 40),
 
               // TOMBOL SIMPAN
@@ -287,11 +251,10 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       determinedCategory = 'Evening';
                     }
 
-                    // Logika penentuan interval hari
                     int interval = 1;
-                    if (_periodeMinum == '2 Hari Sekali') interval = 2;
-                    if (_periodeMinum == '3 Hari Sekali') interval = 3;
-                    if (_periodeMinum == 'Seminggu Sekali') interval = 7;
+                    if (_periodeMinum == 'Every 2 Days') interval = 2;
+                    if (_periodeMinum == 'Every 3 Days') interval = 3;
+                    if (_periodeMinum == 'Once a Week') interval = 7;
 
                     final String newId = DateTime.now().millisecondsSinceEpoch
                         .toString();
@@ -299,12 +262,14 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                     final newMeds = Medicine(
                       id: newId,
                       title: _nameCtrl.text.isEmpty
-                          ? 'Obat Baru'
+                          ? 'New Medicine'
                           : _nameCtrl.text,
                       latinName: '-',
                       type: _dosisSatuan,
-                      quantity: '$_frekuensi Kali Sehari',
-                      totalDosage: _aturanMinum,
+                      quantity:
+                          '${_dosisAngkaCtrl.text} $_dosisSatuan', // Menampilkan dosis (misal: "1 Capsule") ke kartu
+                      totalDosage:
+                          _aturanMinum, // Aturan minum masuk ke sub-badge kartu
                       remain: int.tryParse(_remainCtrl.text) ?? 0,
                       time: DateTime(
                         DateTime.now().year,
@@ -313,7 +278,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                         hour,
                         minute,
                       ),
-                      isMeal: _aturanMinum.contains('makan'),
+                      isMeal: _aturanMinum.toLowerCase().contains('meal'),
                       category: determinedCategory,
                       imageUrl:
                           'https://images.unsplash.com/photo-1584308666744-24d5e4b77f39?q=80&w=1000&auto=format&fit=crop',
@@ -321,7 +286,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       lamaKonsumsi:
                           '${_lamaKonsumsiAngkaCtrl.text} $_lamaKonsumsiSatuan',
                       periodeMinum: _periodeMinum,
-                      intervalHari: interval, // Dimasukkan di sini!
+                      intervalHari: interval,
                       catatan: _notesCtrl.text,
                     );
 
@@ -330,7 +295,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${newMeds.title} berhasil ditambahkan!'),
+                        content: Text('${newMeds.title} added successfully!'),
                         backgroundColor: AppTheme.primary,
                       ),
                     );

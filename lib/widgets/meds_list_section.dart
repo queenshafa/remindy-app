@@ -40,7 +40,8 @@ class MedsListSection extends StatelessWidget {
               title: med.title,
               quantity: med.quantity,
               time: med.time,
-              isMeal: med.isMeal,
+              instruction:
+                  med.totalDosage, // <-- Menggunakan teks instruksi asli
               category: med.category,
 
               // 👉 HILANGKAN TOMBOL JIKA BERADA DI MEDS TAKEN

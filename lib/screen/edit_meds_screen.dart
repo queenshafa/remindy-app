@@ -23,10 +23,9 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
   final _minuteCtrl = TextEditingController();
 
   String _dosisSatuan = 'Tablet';
-  String _lamaKonsumsiSatuan = 'hari';
-  String _periodeMinum = 'Setiap Hari';
-  String _frekuensi = '1';
-  String _aturanMinum = 'Setelah makan';
+  String _lamaKonsumsiSatuan = 'Days';
+  String _periodeMinum = 'Everyday';
+  String _aturanMinum = 'After meal';
 
   @override
   void initState() {
@@ -40,46 +39,47 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
     _hourCtrl.text = med.time.hour.toString().padLeft(2, '0');
     _minuteCtrl.text = med.time.minute.toString().padLeft(2, '0');
 
-    // Parse Data Dosis (contoh: "2 Kapsul" -> "2", "Kapsul")
+    // Parse Data Dosis (contoh: "1 Tablet" -> "1", "Tablet")
     final dosisParts = (med.dosisLengkap ?? '1 Tablet').split(' ');
     _dosisAngkaCtrl.text = dosisParts.isNotEmpty ? dosisParts[0] : '1';
     final parsedDosisSatuan = dosisParts.length > 1 ? dosisParts[1] : 'Tablet';
     if ([
-      'Supositoria',
+      'Suppository',
       'Tablet',
-      'Tetes',
-      'Kaplet',
-      'Kapsul',
-      'Pil',
-      'Semprotan',
+      'Drops',
+      'Caplet',
+      'Capsule',
+      'Pill',
+      'Spray',
     ].contains(parsedDosisSatuan)) {
       _dosisSatuan = parsedDosisSatuan;
     }
 
-    // Parse Data Lama Konsumsi (contoh: "10 minggu" -> "10", "minggu")
-    final lamaParts = (med.lamaKonsumsi ?? '1 hari').split(' ');
-    _lamaKonsumsiAngkaCtrl.text = lamaParts.isNotEmpty ? lamaParts[0] : '1';
-    final parsedLamaSatuan = lamaParts.length > 1 ? lamaParts[1] : 'hari';
-    if (['hari', 'minggu', 'bulan', 'tahun'].contains(parsedLamaSatuan)) {
+    // Parse Data Lama Konsumsi (contoh: "7 Days" -> "7", "Days")
+    final lamaParts = (med.lamaKonsumsi ?? '7 Days').split(' ');
+    _lamaKonsumsiAngkaCtrl.text = lamaParts.isNotEmpty ? lamaParts[0] : '7';
+    final parsedLamaSatuan = lamaParts.length > 1 ? lamaParts[1] : 'Days';
+    if (['Days', 'Weeks', 'Months', 'Years'].contains(parsedLamaSatuan)) {
       _lamaKonsumsiSatuan = parsedLamaSatuan;
     }
 
-    // Parse Data Periode & Frekuensi
-    if (['Setiap Hari', 'Hari Pilihan'].contains(med.periodeMinum)) {
+    // Parse Periode Minum
+    if ([
+      'Everyday',
+      'Every 2 Days',
+      'Every 3 Days',
+      'Once a Week',
+    ].contains(med.periodeMinum)) {
       _periodeMinum = med.periodeMinum!;
     }
 
-    final freqParts = (med.quantity).split(' ');
-    if (['1', '2', '3', '4', '5'].contains(freqParts[0])) {
-      _frekuensi = freqParts[0];
-    }
-
+    // Parse Aturan Minum
     if ([
-      'Sebelum tidur',
-      'Setelah makan',
-      'Sebelum makan',
-      'Setelah bangun tidur',
-      'Saat Makan',
+      'Before bed',
+      'After meal',
+      'Before meal',
+      'After waking up',
+      'With meal',
     ].contains(med.totalDosage)) {
       _aturanMinum = med.totalDosage;
     }
@@ -168,7 +168,7 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
               const SizedBox(height: 32),
 
               Text(
-                'Edit Medicine:',
+                'Edit Medicine',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
@@ -177,15 +177,12 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
               ),
               const SizedBox(height: 24),
 
-              const MedsLabel('Nama Obat:'),
-              MedsTextField(
-                controller: _nameCtrl,
-                hint: 'Contoh: Paracetamol...',
-              ),
+              const MedsLabel('Medicine Name:'),
+              MedsTextField(controller: _nameCtrl, hint: 'e.g. Paracetamol'),
               const SizedBox(height: 20),
 
-              const MedsLabel('Sisa Stok Obat (Botol/Strip):'),
-              MedsTextField(controller: _remainCtrl, hint: 'Contoh: 30'),
+              const MedsLabel('Remaining Stock (Bottles/Strips):'),
+              MedsTextField(controller: _remainCtrl, hint: 'e.g. 30'),
               const SizedBox(height: 24),
 
               Row(
@@ -195,11 +192,8 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Dosis:'),
-                        MedsTextField(
-                          controller: _dosisAngkaCtrl,
-                          hint: 'Ex: 1',
-                        ),
+                        const MedsLabel('Dosage:'),
+                        MedsTextField(controller: _dosisAngkaCtrl, hint: '1'),
                       ],
                     ),
                   ),
@@ -209,17 +203,17 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Satuan:'),
+                        const MedsLabel('Unit:'),
                         _buildDropdown(
                           value: _dosisSatuan,
                           items: [
-                            'Supositoria',
+                            'Suppository',
                             'Tablet',
-                            'Tetes',
-                            'Kaplet',
-                            'Kapsul',
-                            'Pil',
-                            'Semprotan',
+                            'Drops',
+                            'Caplet',
+                            'Capsule',
+                            'Pill',
+                            'Spray',
                           ],
                           onChanged: (val) =>
                               setState(() => _dosisSatuan = val!),
@@ -238,10 +232,10 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Lama Konsumsi:'),
+                        const MedsLabel('Duration:'),
                         MedsTextField(
                           controller: _lamaKonsumsiAngkaCtrl,
-                          hint: 'Ex: 3',
+                          hint: '3',
                         ),
                       ],
                     ),
@@ -252,10 +246,10 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const MedsLabel('Waktu:'),
+                        const MedsLabel('Period Unit:'),
                         _buildDropdown(
                           value: _lamaKonsumsiSatuan,
-                          items: ['hari', 'minggu', 'bulan', 'tahun'],
+                          items: ['Days', 'Weeks', 'Months', 'Years'],
                           onChanged: (val) =>
                               setState(() => _lamaKonsumsiSatuan = val!),
                         ),
@@ -266,63 +260,39 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
               ),
               const SizedBox(height: 20),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const MedsLabel('Periode Minum:'),
-                        _buildDropdown(
-                          value: _periodeMinum,
-                          items: ['Setiap Hari', 'Hari Pilihan'],
-                          onChanged: (val) =>
-                              setState(() => _periodeMinum = val!),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const MedsLabel('Berapa Kali Sehari:'),
-                        _buildDropdown(
-                          value: _frekuensi,
-                          items: ['1', '2', '3', '4', '5'],
-                          onChanged: (val) => setState(() => _frekuensi = val!),
-                        ),
-                      ],
-                    ),
-                  ),
+              const MedsLabel('Drinking Frequency / Interval:'),
+              _buildDropdown(
+                value: _periodeMinum,
+                items: [
+                  'Everyday',
+                  'Every 2 Days',
+                  'Every 3 Days',
+                  'Once a Week',
                 ],
+                onChanged: (val) => setState(() => _periodeMinum = val!),
               ),
               const SizedBox(height: 20),
 
-              const MedsLabel('Aturan Minum:'),
+              const MedsLabel('Instruction:'),
               _buildDropdown(
                 value: _aturanMinum,
                 items: [
-                  'Sebelum tidur',
-                  'Setelah makan',
-                  'Sebelum makan',
-                  'Setelah bangun tidur',
-                  'Saat Makan',
+                  'Before bed',
+                  'After meal',
+                  'Before meal',
+                  'After waking up',
+                  'With meal',
                 ],
                 onChanged: (val) => setState(() => _aturanMinum = val!),
               ),
               const SizedBox(height: 20),
 
-              const MedsLabel('Waktu Pengingat (Time to take):'),
+              const MedsLabel('Time to take:'),
               MedsTimeInput(hourCtrl: _hourCtrl, minCtrl: _minuteCtrl),
               const SizedBox(height: 20),
 
-              const MedsLabel('Catatan (Opsional):'),
-              MedsTextField(
-                controller: _notesCtrl,
-                hint: 'Tambahkan catatan jika ada...',
-              ),
+              const MedsLabel('Notes (Optional):'),
+              MedsTextField(controller: _notesCtrl, hint: 'Add notes here...'),
               const SizedBox(height: 40),
 
               SizedBox(
@@ -342,14 +312,19 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                       determinedCategory = 'Evening';
                     }
 
+                    int interval = 1;
+                    if (_periodeMinum == 'Every 2 Days') interval = 2;
+                    if (_periodeMinum == 'Every 3 Days') interval = 3;
+                    if (_periodeMinum == 'Once a Week') interval = 7;
+
                     final updatedMeds = Medicine(
-                      id: widget.medicine.id, // TETAP GUNAKAN ID LAMA
+                      id: widget.medicine.id, // Tetap gunakan ID lama
                       title: _nameCtrl.text.isEmpty
-                          ? 'Obat Baru'
+                          ? 'New Medicine'
                           : _nameCtrl.text,
                       latinName: '-',
                       type: _dosisSatuan,
-                      quantity: '$_frekuensi Kali Sehari',
+                      quantity: '${_dosisAngkaCtrl.text} $_dosisSatuan',
                       totalDosage: _aturanMinum,
                       remain: int.tryParse(_remainCtrl.text) ?? 0,
                       time: DateTime(
@@ -359,33 +334,33 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                         hour,
                         minute,
                       ),
-                      isMeal: _aturanMinum.contains('makan'),
+                      isMeal: _aturanMinum.toLowerCase().contains('meal'),
                       category: determinedCategory,
                       imageUrl: widget.medicine.imageUrl,
                       dosisLengkap: '${_dosisAngkaCtrl.text} $_dosisSatuan',
                       lamaKonsumsi:
                           '${_lamaKonsumsiAngkaCtrl.text} $_lamaKonsumsiSatuan',
                       periodeMinum: _periodeMinum,
+                      intervalHari: interval,
                       catatan: _notesCtrl.text,
+                      consumedDates: widget.medicine.consumedDates,
                     );
 
-                    // LOGIKA MENGGANTI DATA LAMA DENGAN YANG BARU
+                    // Update data di global state
                     final currentMeds = globalMedicinesNotifier.value;
                     final index = currentMeds.indexWhere(
                       (m) => m.id == updatedMeds.id,
                     );
                     if (index != -1) {
                       currentMeds[index] = updatedMeds;
-                      globalMedicinesNotifier.value = List.from(
-                        currentMeds,
-                      ); // Trigger UI Update
+                      globalMedicinesNotifier.value = List.from(currentMeds);
                     }
 
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          '${updatedMeds.title} berhasil diperbarui!',
+                          '${updatedMeds.title} updated successfully!',
                         ),
                         backgroundColor: AppTheme.primary,
                       ),

@@ -1,9 +1,44 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/screen/splash_screen.dart';
-import 'package:remindy_app/screen/subscribe_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 
-void main() {
+Future<void> initializeRevenueCat() async {
+  await Purchases.setLogLevel(LogLevel.debug);
+
+  String apiKey;
+  if (Platform.isIOS) {
+    apiKey = 'test_qoXhKzHXDpFYeUiwKNVRLIkirnm';
+  } else if (Platform.isAndroid) {
+    apiKey = 'test_qoXhKzHXDpFYeUiwKNVRLIkirnm';
+  } else {
+    throw UnsupportedError('Platform not supported');
+  }
+
+  await Purchases.configure(PurchasesConfiguration(apiKey));
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 👇 TAMBAHKAN PENGECEKAN kIsWeb DI SINI 👇
+  if (!kIsWeb) {
+    try {
+      await initializeRevenueCat();
+
+      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+      if (customerInfo.entitlements.all["pro"]?.isActive == true) {
+        globalIsProNotifier.value = true;
+      }
+    } catch (e) {
+      debugPrint("Gagal mengecek status langganan: $e");
+    }
+  }
+
   runApp(const MyApp());
 }
 
@@ -16,7 +51,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Remindy App',
       theme: AppTheme.theme,
-      home: SubscribeScreen(),
+      home: SplashScreen(),
     );
   }
 }

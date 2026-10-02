@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
-import 'package:remindy_app/screen/edit_meds_screen.dart'; // Import layar edit baru
+import 'package:remindy_app/screen/edit_meds_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/widgets/meds_detail_components.dart';
 
 class MedsDetailScreen extends StatelessWidget {
-  final Medicine medicine; // Menerima data awal
+  final Medicine medicine;
 
   const MedsDetailScreen({super.key, required this.medicine});
 
@@ -23,13 +23,9 @@ class MedsDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ValueListenableBuilder memastikan layar ini di-render ulang (refresh otomatis)
-    // setiap kali ada perubahan pada globalMedicinesNotifier (setelah diedit)
     return ValueListenableBuilder<List<Medicine>>(
       valueListenable: globalMedicinesNotifier,
       builder: (context, medsList, child) {
-        // Cari data obat terbaru berdasarkan ID.
-        // Jika tidak ketemu (misal terhapus), fallback ke data lama.
         final currentMed = medsList.firstWhere(
           (m) => m.id == medicine.id,
           orElse: () => medicine,
@@ -45,7 +41,7 @@ class MedsDetailScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 16),
 
-                  // CUSTOM HEADER: Hanya Tombol Back (Tombol Edit atas dihilangkan)
+                  // CUSTOM HEADER: Tombol Kembali
                   Row(
                     children: [
                       InkWell(
@@ -76,7 +72,7 @@ class MedsDetailScreen extends StatelessWidget {
 
                   DetailRemainChip(
                     remainText:
-                        '${currentMed.remain} ${currentMed.type} Tersisa',
+                        '${currentMed.remain} ${currentMed.type} remaining',
                   ),
                   const SizedBox(height: 32),
 
@@ -84,14 +80,14 @@ class MedsDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildInfoCard(
-                          'Frekuensi/Hari:',
-                          currentMed.quantity,
+                          'Dosage / Unit:',
+                          currentMed.dosisLengkap ?? '-',
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: _buildInfoCard(
-                          'Waktu Pengingat:',
+                          'Time to Take:',
                           _formatTime(currentMed.time),
                         ),
                       ),
@@ -103,15 +99,15 @@ class MedsDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildInfoCard(
-                          'Dosis Obat:',
-                          currentMed.dosisLengkap ?? '-',
+                          'Duration:',
+                          currentMed.lamaKonsumsi ?? '-',
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: _buildInfoCard(
-                          'Lama Konsumsi:',
-                          currentMed.lamaKonsumsi ?? '-',
+                          'Frequency / Interval:',
+                          currentMed.periodeMinum ?? '-',
                         ),
                       ),
                     ],
@@ -122,14 +118,7 @@ class MedsDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildInfoCard(
-                          'Periode Minum:',
-                          currentMed.periodeMinum ?? '-',
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildInfoCard(
-                          'Aturan Minum:',
+                          'Instruction:',
                           currentMed.totalDosage,
                         ),
                       ),
@@ -138,21 +127,20 @@ class MedsDetailScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   _buildInfoCard(
-                    'Catatan Tambahan:',
+                    'Additional Notes:',
                     (currentMed.catatan == null || currentMed.catatan!.isEmpty)
-                        ? 'Tidak ada catatan'
+                        ? 'No notes added'
                         : currentMed.catatan!,
                   ),
 
                   const SizedBox(height: 40),
 
-                  // 👇 TOMBOL EDIT PRIMARY DI BAWAH 👇
+                  // TOMBOL EDIT DI BAWAH
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Arahkan ke form edit dengan mengirimkan data obat terbaru
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -169,7 +157,7 @@ class MedsDetailScreen extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Edit Data Obat',
+                        'Edit Medicine Data',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

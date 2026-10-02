@@ -9,10 +9,10 @@ class MedicineCard extends StatelessWidget {
     required this.quantity,
     required this.onTap,
     required this.time,
-    required this.isMeal,
+    required this.instruction, // Menggantikan isMeal agar teks instruksi dinamis
     this.category = 'Morning',
     this.onConsume,
-    this.historyStatus, // <-- Tambahan parameter untuk Track Screen ('done' atau 'miss')
+    this.historyStatus,
   });
 
   final String title;
@@ -20,9 +20,10 @@ class MedicineCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onConsume;
   final DateTime time;
-  final bool isMeal;
+  final String
+  instruction; // Menerima teks instruksi secara langsung (misal: 'Before bed', 'With meal', dll)
   final String category;
-  final String? historyStatus; // <-- Bisa null, 'done', atau 'miss'
+  final String? historyStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class MedicineCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
 
-                      // isMeal Chip
+                      // Instruction Chip (Sekarang menampilkan teks asli sesuai pilihan di form)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -92,7 +93,7 @@ class MedicineCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          isMeal ? 'After meal' : 'Before meal',
+                          instruction,
                           style: GoogleFonts.plusJakartaSans(
                             color: Colors.white,
                             fontSize: 13,
@@ -137,7 +138,7 @@ class MedicineCard extends StatelessWidget {
                         ),
                       ),
 
-                      // 👉 RENDER BADGE DONE / MISS JIKA ADA STATUS DARI TRACK SCREEN
+                      // RENDER BADGE DONE / MISS JIKA ADA STATUS DARI TRACK SCREEN
                       if (historyStatus == 'done' || historyStatus == 'miss')
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -146,8 +147,8 @@ class MedicineCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: historyStatus == 'done'
-                                ? const Color(0xFF00C853) // Hijau Done
-                                : AppTheme.primary, // Merah Miss
+                                ? const Color(0xFF00C853)
+                                : AppTheme.primary,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -173,7 +174,6 @@ class MedicineCard extends StatelessWidget {
                             ],
                           ),
                         )
-                      // 👉 KALAU TIDAK ADA STATUS HISTORY, RENDER TOMBOL CONSUME BIASA
                       else if (onConsume != null)
                         GestureDetector(
                           onTap: onConsume,

@@ -217,9 +217,9 @@ class _HistoryScreenState extends State<TrackScreen> {
                               title: med.title,
                               quantity: med.quantity,
                               time: med.time,
-                              isMeal: med.isMeal,
+                              instruction: med
+                                  .totalDosage, // <-- Menggunakan teks instruksi asli
                               category: med.category,
-                              historyStatus: currentHistoryStatus,
                               onTap: () {},
                             ),
                           ),

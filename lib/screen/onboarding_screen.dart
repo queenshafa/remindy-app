@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:remindy_app/screen/register_screen.dart';
+import 'package:remindy_app/screen/subscribe_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/screen/main_screen.dart';
 
@@ -89,7 +91,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Jika di halaman terakhir (Finish), pindah ke MainScreen
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const MainScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const RegisterScreen(),
+                        ),
                       );
                     } else {
                       // Jika belum terakhir (Next), geser ke halaman berikutnya

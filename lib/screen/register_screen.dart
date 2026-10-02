@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
+import 'package:remindy_app/screen/subscribe_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/screen/main_screen.dart';
 
@@ -172,7 +173,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => const MainScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const SubscribeScreen(),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(

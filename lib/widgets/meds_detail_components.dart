@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/models/medicine.dart';
 import 'package:remindy_app/theme/app_theme.dart';
+import 'package:remindy_app/widgets/circle_icon_button.dart';
+import 'package:remindy_app/widgets/settings_bottom_sheet.dart';
 
 // 1. Header Navigation (Back & Edit)
 class DetailHeader extends StatelessWidget {
@@ -18,9 +20,11 @@ class DetailHeader extends StatelessWidget {
           child: Icon(Icons.arrow_back, color: Colors.black),
         ),
       ),
-      const CircleAvatar(
-        backgroundColor: Colors.white,
-        child: Icon(Icons.edit, color: Colors.black, size: 20),
+      CircleIconButton(
+        icon: Icons.settings_outlined,
+        onTap: () {
+          SettingsBottomSheet.show(context);
+        },
       ),
     ],
   );

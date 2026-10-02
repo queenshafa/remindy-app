@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/theme/app_theme.dart';
+import 'package:remindy_app/widgets/circle_icon_button.dart';
+import 'package:remindy_app/widgets/settings_bottom_sheet.dart';
 
 // --- JUDUL HALAMAN ---
 class HistoryTitle extends StatelessWidget {
@@ -24,9 +26,11 @@ class HistoryTitle extends StatelessWidget {
         ),
         Row(
           children: [
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.settings_outlined, color: Colors.grey.shade800),
+            CircleIconButton(
+              icon: Icons.settings_outlined,
+              onTap: () {
+                SettingsBottomSheet.show(context);
+              },
             ),
           ],
         ),

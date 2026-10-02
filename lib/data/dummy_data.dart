@@ -11,42 +11,16 @@ final ValueNotifier<String> globalUserNameNotifier = ValueNotifier('Nari');
 final ValueNotifier<String> globalFamilyNumberNotifier = ValueNotifier(
   '+6285210719896',
 );
+final ValueNotifier<bool> globalWaNotifNotifier = ValueNotifier(true);
+final ValueNotifier<bool> globalIsProNotifier = ValueNotifier<bool>(false);
 
 // 👉 GLOBAL STATE: Untuk mendeteksi kalender sedang ada di hari apa
 final ValueNotifier<DateTime> globalSelectedDateNotifier = ValueNotifier(
   DateTime.now(),
 );
 
-final ValueNotifier<List<Medicine>> globalMedicinesNotifier = ValueNotifier([
-  Medicine(
-    id: 'm1',
-    title: 'Rifampisin',
-    latinName: 'Rifampicinum',
-    type: 'Capsule',
-    quantity: '1 capsule',
-    totalDosage: '150 mg',
-    remain: 20,
-    time: DateTime(2026, 9, 28, 9, 0),
-    isMeal: true,
-    category: 'Morning',
-    imageUrl:
-        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1000&auto=format&fit=crop',
-  ),
-  Medicine(
-    id: 'm2',
-    title: 'Paracetamol',
-    latinName: 'Acetaminophen',
-    type: 'Tablet',
-    quantity: '1 tablet',
-    totalDosage: '500 mg',
-    remain: 12,
-    time: DateTime(2026, 9, 28, 13, 0),
-    isMeal: false,
-    category: 'Afternoon',
-    imageUrl:
-        'https://images.unsplash.com/photo-1628771065518-0d82f1938462?q=80&w=1000&auto=format&fit=crop',
-  ),
-]);
+// 👉 DIKOSONGKAN AGAR TIDAK ADA OBAT BAWAAN (DUMMY)
+final ValueNotifier<List<Medicine>> globalMedicinesNotifier = ValueNotifier([]);
 
 void addMedicine(Medicine newMedicine) {
   final updatedList = List<Medicine>.from(globalMedicinesNotifier.value)
@@ -54,7 +28,7 @@ void addMedicine(Medicine newMedicine) {
   globalMedicinesNotifier.value = updatedList;
 }
 
-// 👉 MENCATAT TANGGAL SAAT OBAT DIMINUM
+// 👉 MENCATAT TANGGAL SAAT OBAT DIMINUM DAN MENGURANGI STOK
 void markMedicineAsConsumed(String id, DateTime date) {
   String dateStr =
       "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -66,7 +40,28 @@ void markMedicineAsConsumed(String id, DateTime date) {
       if (!newConsumedDates.contains(dateStr)) {
         newConsumedDates.add(dateStr); // Simpan tanggal minumnya
       }
-      return med.copyWith(consumedDates: newConsumedDates);
+
+      // Ambil angka dosis dari string quantity (misal: "2 Tablet" -> ambil angka "2")
+      int doseAmount = 1;
+      try {
+        final parts = med.quantity.split(' ');
+        if (parts.isNotEmpty) {
+          doseAmount = int.tryParse(parts[0]) ?? 1;
+        }
+      } catch (_) {
+        doseAmount = 1;
+      }
+
+      // Kurangi stok, pastikan tidak kurang dari 0 (tidak minus)
+      int updatedRemain = med.remain - doseAmount;
+      if (updatedRemain < 0) {
+        updatedRemain = 0;
+      }
+
+      return med.copyWith(
+        consumedDates: newConsumedDates,
+        remain: updatedRemain, // 👉 INI YANG KEMARIN KETINGGALAN!
+      );
     }
     return med;
   }).toList();

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/theme/app_theme.dart';
+import 'package:remindy_app/widgets/circle_icon_button.dart';
+import 'package:remindy_app/widgets/settings_bottom_sheet.dart';
 
 class MedsHeader extends StatefulWidget {
   final ValueChanged<DateTime>? onDateSelected;
@@ -31,15 +33,11 @@ class _MedsHeaderState extends State<MedsHeader> {
 
     // Otomatis scroll ke posisi hari ini setelah widget selesai dirender
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Indeks ke-7 adalah hari ini (karena mulai dari 7 hari lalu)
-      // Lebar satu item kalender (44 width + 14 margin = 58 px)
       const itemWidth = 58.0;
       const targetIndex = 7;
 
       if (_scrollController.hasClients) {
-        _scrollController.jumpTo(
-          targetIndex * itemWidth - 40,
-        ); // Sesuaikan padding kiri
+        _scrollController.jumpTo(targetIndex * itemWidth - 40);
       }
     });
   }
@@ -74,6 +72,7 @@ class _MedsHeaderState extends State<MedsHeader> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // BARIS PERTAMA: Header Judul & Tombol Settings
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,13 +100,18 @@ class _MedsHeaderState extends State<MedsHeader> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.grey.shade300, width: 1),
                 ),
-                child: const Icon(Icons.add, color: Colors.black, size: 28),
+                child: CircleIconButton(
+                  icon: Icons.settings_outlined,
+                  onTap: () {
+                    SettingsBottomSheet.show(context);
+                  },
+                ),
               ),
             ],
           ),
           const SizedBox(height: 36),
 
-          // Kalender Horizontal yang otomatis menyorot hari ini
+          // BARIS KEDUA: Kalender Horizontal
           SizedBox(
             height: 72,
             child: ListView.builder(
@@ -117,7 +121,6 @@ class _MedsHeaderState extends State<MedsHeader> {
               itemBuilder: (context, index) {
                 final date = _daysList[index];
 
-                // Cek apakah tanggal ini adalah hari ini (otomatis ter-highlight)
                 final isSelected =
                     date.year == _selectedDate.year &&
                     date.month == _selectedDate.month &&
@@ -129,7 +132,6 @@ class _MedsHeaderState extends State<MedsHeader> {
                       _selectedDate = date;
                     });
 
-                    // 👉 TAMBAHKAN BARIS INI: Sinkronkan kalender ke otak global
                     globalSelectedDateNotifier.value = date;
 
                     if (widget.onDateSelected != null) {
@@ -153,7 +155,6 @@ class _MedsHeaderState extends State<MedsHeader> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            // Jika hari ini/dipilih, warnanya abu-abu tua khas desainmu
                             color: isSelected
                                 ? const Color(0xFF7E7D7A)
                                 : Colors.white,

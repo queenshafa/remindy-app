@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Medicine {
   final String id;
   final String title;
@@ -38,22 +40,16 @@ class Medicine {
   });
 
   bool isScheduledForDate(DateTime selectedDate) {
-    // Abaikan jam, fokus pada tanggal awal minum
     DateTime startDate = DateTime(time.year, time.month, time.day);
-    // Tanggal yang sedang dilihat user
     DateTime targetDate = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
     );
 
-    // Jika user melihat tanggal sebelum obat dibuat, jangan munculkan
     if (targetDate.isBefore(startDate)) return false;
 
-    // Hitung jarak hari
     int differenceInDays = targetDate.difference(startDate).inDays;
-
-    // RUMUS SAKTI: Cek dengan sisa bagi (modulo)
     return differenceInDays % intervalHari == 0;
   }
 
@@ -63,10 +59,10 @@ class Medicine {
     return consumedDates.contains(dateString);
   }
 
-  // 👇 PERBAIKANNYA DI SINI: Menambahkan parameter time 👇
   Medicine copyWith({
-    DateTime? time, // <-- Tambahkan ini
+    DateTime? time,
     List<String>? consumedDates,
+    int? remain, // <-- Pastikan ada ini
   }) {
     return Medicine(
       id: id,
@@ -75,12 +71,17 @@ class Medicine {
       type: type,
       quantity: quantity,
       totalDosage: totalDosage,
-      remain: remain,
-      time: time ?? this.time, // <-- Gunakan time baru jika ada
+      remain: remain ?? this.remain, // <-- Update remain
+      time: time ?? this.time,
       isMeal: isMeal,
       category: category,
       imageUrl: imageUrl,
       consumedDates: consumedDates ?? this.consumedDates,
+      dosisLengkap: dosisLengkap,
+      lamaKonsumsi: lamaKonsumsi,
+      periodeMinum: periodeMinum,
+      catatan: catatan,
+      intervalHari: intervalHari,
     );
   }
 }

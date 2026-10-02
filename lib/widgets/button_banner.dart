@@ -19,37 +19,31 @@ class ButtonBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(
-        24,
-      ), // Radius kartu lebih melengkung sesuai desain
+      borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(
-          24,
-        ), // Agar efek ripple ikutan melengkung
+        borderRadius: BorderRadius.circular(24),
         child: Container(
-          width: 190,
-          padding: const EdgeInsets.all(20), // Padding dalam kartu
+          // Ukuran diset fleksibel agar tidak overflow saat dibagi 2 di layar
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon Lingkaran Merah
               Container(
                 width: 64,
                 height: 64,
                 decoration: const BoxDecoration(
                   color: AppTheme.primary,
-                  shape: BoxShape.circle, // Buat lingkaran sempurna
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(icon, size: 26, color: Colors.white),
               ),
               const SizedBox(height: 20),
-
-              // Title (Adherence Rate / Day 45/180)
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -57,12 +51,10 @@ class ButtonBanner extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-
-              // Description (90% Adherence / 135 days left)
               Text(
                 description,
-                style: TextStyle(
-                  fontSize: 16,
+                style: const TextStyle(
+                  fontSize: 14, // Dikecilkan sedikit agar muat dengan rapi
                   color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
