@@ -54,48 +54,67 @@ class HomeContentHeader extends StatelessWidget {
           ValueListenableBuilder<List<Medicine>>(
             valueListenable: globalMedicinesNotifier,
             builder: (context, medicines, child) {
-              // 1. LOGIKA MENCARI MAKSIMUM HARI KONSUMSI
-              int maxDays = 0;
-              for (var med in medicines) {
-                int currentMedDays = 0;
+              int maxDaysLeft = 0;
+              final now = DateTime.now();
+              // Normalisasi waktu ke tengah malam agar hitungan hari presisi
+              final today = DateTime(now.year, now.month, now.day);
 
+              for (var med in medicines) {
+                int totalDays = 0;
+
+                // 1. Hitung total durasi hari berdasarkan inputan
                 if (med.lamaKonsumsi != null && med.lamaKonsumsi!.isNotEmpty) {
                   final parts = med.lamaKonsumsi!.split(' ');
                   if (parts.length >= 2) {
                     int val = int.tryParse(parts[0]) ?? 0;
                     String unit = parts[1].toLowerCase();
 
-                    // Mengecek satuan dalam bahasa Inggris (dan fallback bahasa Indonesia)
                     if (unit.contains('day') || unit.contains('hari')) {
-                      currentMedDays = val;
+                      totalDays = val;
                     } else if (unit.contains('week') ||
                         unit.contains('minggu')) {
-                      currentMedDays = val * 7;
+                      totalDays = val * 7;
                     } else if (unit.contains('month') ||
                         unit.contains('bulan')) {
-                      currentMedDays = val * 30; // Estimasi 30 hari/bulan
+                      totalDays = val * 30;
                     } else if (unit.contains('year') ||
                         unit.contains('tahun')) {
-                      currentMedDays = val * 365;
+                      totalDays = val * 365;
                     }
                   }
                 }
 
-                // Jika hari obat ini lebih besar dari maxDays sebelumnya, timpa nilainya (tidak ditambahkan)
-                if (currentMedDays > maxDays) {
-                  maxDays = currentMedDays;
+                // 2. Hitung berapa hari yang sudah berlalu sejak startDate
+                int daysPassed = 0;
+                if (med.startDate != null) {
+                  final start = DateTime(
+                    med.startDate!.year,
+                    med.startDate!.month,
+                    med.startDate!.day,
+                  );
+                  daysPassed = today.difference(start).inDays;
+                }
+
+                // 3. Kurangi total hari dengan hari yang sudah berlalu
+                int daysLeft = totalDays - daysPassed;
+                if (daysLeft < 0) {
+                  daysLeft = 0; // Cegah angka minus kalau sudah lewat target
+                }
+
+                // 4. Cari nilai sisa hari paling panjang di antara semua obat
+                if (daysLeft > maxDaysLeft) {
+                  maxDaysLeft = daysLeft;
                 }
               }
 
-              // 2. TAMPILAN BANNER
               return Row(
                 children: [
-                  // KIRI: DAYS LEFT (Durasi Maksimal)
                   Expanded(
                     child: ButtonBanner(
                       icon: Icons.calendar_month_rounded,
                       title: 'Longest Meds',
-                      description: '$maxDays Days Left',
+                      description:
+                          '$maxDaysLeft Days Left', // Sekarang angkanya otomatis turun!
                       onTap: () {},
                     ),
                   ),

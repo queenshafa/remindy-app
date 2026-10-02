@@ -57,7 +57,7 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
       style: GoogleFonts.plusJakartaSans(
         fontSize: 14,
@@ -264,7 +264,6 @@ class _AddMedsManualScreenState extends State<AddMedsManualScreen> {
                       title: _nameCtrl.text.isEmpty
                           ? 'New Medicine'
                           : _nameCtrl.text,
-                      latinName: '-',
                       type: _dosisSatuan,
                       quantity:
                           '${_dosisAngkaCtrl.text} $_dosisSatuan', // Menampilkan dosis (misal: "1 Capsule") ke kartu

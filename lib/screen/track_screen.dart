@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/models/medicine.dart';
+import 'package:remindy_app/screen/meds_detail_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
 import 'package:remindy_app/widgets/medicine_card.dart';
 import 'package:remindy_app/widgets/track_header_component.dart';
@@ -220,7 +221,16 @@ class _HistoryScreenState extends State<TrackScreen> {
                               instruction: med
                                   .totalDosage, // <-- Menggunakan teks instruksi asli
                               category: med.category,
-                              onTap: () {},
+                              historyStatus: currentHistoryStatus,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        MedsDetailScreen(medicine: med),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],

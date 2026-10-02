@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/screen/register_screen.dart';
-import 'package:remindy_app/screen/subscribe_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
-import 'package:remindy_app/screen/main_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

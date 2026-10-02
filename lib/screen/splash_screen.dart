@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:remindy_app/data/dummy_data.dart';
+import 'package:remindy_app/screen/main_screen.dart';
 import 'package:remindy_app/screen/onboarding_screen.dart';
 import 'package:remindy_app/theme/app_theme.dart';
-import 'package:remindy_app/screen/main_screen.dart'; // Ganti jika halaman awalmu bukan main_screen.dart
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,19 +43,37 @@ class _SplashScreenState extends State<SplashScreen>
     // 4. Jalankan animasi
     _controller.forward();
 
-    // 5. Pindah ke halaman utama setelah delay 3 detik (waktu splash screen tampil)
-    Future.delayed(const Duration(seconds: 3), () {
-      // Pastikan context masih valid sebelum berpindah layar
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const OnboardingScreen(),
-          ), // Arahkan ke layar beranda kamu
-        );
-      }
-    });
+    // 5. Panggil fungsi pengecekan memori (Setup / Onboarding)
+    _initializeApp();
   }
+
+  Future<void> _initializeApp() async {
+    // Jalankan inisialisasi auto-save data
+    await initAppData();
+
+    // Kasih jeda waktu 2 detik biar logo Splash Screen-nya kelihatan
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Cek apakah user sudah pernah menyelesaikan setup
+    final prefs = await SharedPreferences.getInstance();
+    bool isSetupDone = prefs.getBool('isSetupDone') ?? false;
+
+    if (!mounted) return;
+
+    if (isSetupDone) {
+      // Kalau sudah pernah setup, langsung lompat ke MainScreen!
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } else {
+      // Kalau belum (baru pertama kali install), pergi ke Onboarding
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+      );
+    }
+  } // <-- Ini kurung kurawal yang tadi kelupaan
 
   @override
   void dispose() {
@@ -64,27 +84,27 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Background merah solid sesuai dengan gambar desainmu
       backgroundColor: AppTheme.primary,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Image.asset(
-              'assets/images/logo_splash.png', // 👇 NAMA FILE GAMBARMU NANTI
-              width: 180, // Sesuaikan ukuran gambar
-              // Kalau gambar belum ada, kita kasih pesan fallback error biar app nggak crash
-              errorBuilder: (context, error, stackTrace) {
-                return const Text(
-                  'Remindy+',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                );
-              },
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Image.asset(
+                'assets/images/logo_splash.png',
+                width: 180,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Text(
+                    'Remindy+',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/medicine.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DummyUser {
   static const String email = 'nari@remindy.com';
@@ -65,4 +67,38 @@ void markMedicineAsConsumed(String id, DateTime date) {
     }
     return med;
   }).toList();
+}
+
+Future<void> initAppData() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // 1. Load data yang sudah tersimpan (jika ada)
+  globalUserNameNotifier.value = prefs.getString('userName') ?? 'User';
+  globalFamilyNumberNotifier.value = prefs.getString('familyNumber') ?? '';
+
+  final String? medsJson = prefs.getString('medicines');
+  if (medsJson != null) {
+    List<dynamic> decoded = jsonDecode(medsJson);
+    globalMedicinesNotifier.value = decoded
+        .map((e) => Medicine.fromJson(e))
+        .toList();
+  } else {
+    // Kalau belum ada data sama sekali, biarkan pakai data dummy bawaan
+  }
+
+  // 2. Pasang Auto-Save! Setiap kali data berubah, langsung simpan ke memori HP.
+  globalUserNameNotifier.addListener(() {
+    prefs.setString('userName', globalUserNameNotifier.value);
+  });
+
+  globalFamilyNumberNotifier.addListener(() {
+    prefs.setString('familyNumber', globalFamilyNumberNotifier.value);
+  });
+
+  globalMedicinesNotifier.addListener(() {
+    final List<Map<String, dynamic>> medsList = globalMedicinesNotifier.value
+        .map((m) => m.toJson())
+        .toList();
+    prefs.setString('medicines', jsonEncode(medsList));
+  });
 }

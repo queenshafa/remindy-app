@@ -322,7 +322,6 @@ class _EditMedsScreenState extends State<EditMedsScreen> {
                       title: _nameCtrl.text.isEmpty
                           ? 'New Medicine'
                           : _nameCtrl.text,
-                      latinName: '-',
                       type: _dosisSatuan,
                       quantity: '${_dosisAngkaCtrl.text} $_dosisSatuan',
                       totalDosage: _aturanMinum,

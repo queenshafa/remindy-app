@@ -42,6 +42,7 @@ dependencies:
   purchases_flutter: ^10.13.1
   google_fonts: ^8.2.1
   purchases_ui_flutter: ^10.14.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
