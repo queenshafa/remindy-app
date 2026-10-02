@@ -40,22 +40,32 @@ This application uses a custom Node.js server to handle WhatsApp notifications. 
 ```bash
 git clone [https://github.com/queenshafarania/remindy_app.git](https://github.com/queenshafarania/remindy_app.git)
 cd remindy_app
+
 ```
 
 ### Step 2: Setup the WhatsApp Bot Server (GoWa)
 
 1. Open your terminal and navigate to the server directory:
-   ```bash
-   cd gowa_server
-   ```
+
+```bash
+cd gowa_server
+
+```
+
 2. Install the required Node.js dependencies:
-   ```bash
-   npm install
-   ```
+
+```bash
+npm install
+
+```
+
 3. Start the server:
-   ```bash
-   node index.js
-   ```
+
+```bash
+node index.js
+
+```
+
 4. A QR Code will be generated in your terminal. Open WhatsApp on your phone, navigate to **Linked Devices**, and scan the QR code.
 5. Once it says "Ready" or "Connected" in the terminal, **leave this terminal open and running** in the background.
 
@@ -68,28 +78,36 @@ Since the WhatsApp server is running locally on your machine, you need to point 
 3. Navigate to `lib/services/whatsapp_service.dart`.
 4. Locate the `baseUrl` variable and replace `127.0.0.1` with your computer's actual local IP address:
 
-   ```dart
-   // Change this:
-   static const String baseUrl = '[http://127.0.0.1:3000/send/text](http://127.0.0.1:3000/send/text)';
+```dart
+// Change this:
+static const String baseUrl = '[http://127.0.0.1:3000/send/text](http://127.0.0.1:3000/send/text)';
 
-   // To something like this (keep the port :3000 or whatever port you use):
-   static const String baseUrl = '[http://192.168.1.5:3000/send/text](http://192.168.1.5:3000/send/text)';
-   ```
+// To something like this (keep the port :3000 or whatever port you use):
+static const String baseUrl = '[http://192.168.1.5:3000/send/text](http://192.168.1.5:3000/send/text)';
 
-   _(Note: Do not use `localhost` or `127.0.0.1` if you are testing on a physical Android/iOS device via a cable)._
+```
+
+_(Note: Do not use `localhost` or `127.0.0.1` if you are testing on a physical Android/iOS device via a cable)._
+
+_(If you are testing the Flutter app on a physical Android or iOS device, both your test phone and your computer must be connected to the exact same Wi-Fi network. Additionally, you must use your machine's local IP address (like 192.168.1.x), because localhost or 127.0.0.1 will not work on a physical device.)_
 
 ### Step 4: Run the App
 
 1. Open a **new terminal tab** (leave the server running in the first tab).
 2. Ensure you are in the root `remindy_app` directory.
 3. Install Flutter dependencies:
-   ```bash
-   flutter pub get
-   ```
+
+```bash
+flutter pub get
+
+```
+
 4. Run the app on your preferred emulator or physical device:
-   ```bash
-   flutter run
-   ```
+
+```bash
+flutter run
+
+```
 
 ---
 
@@ -103,9 +121,12 @@ Since the WhatsApp server is running locally on your machine, you need to point 
 
 ---
 
-## 👨‍💻 Author
+## 👨‍‍💻 Author
 
-**Queenshafa Rania**  
-**Asiyah**  
-Vocational High School Student (Software Engineering)  
+**Queenshafa Rania**
+
+**Asiyah**
+
+Vocational High School Student (Software Engineering)
+
 _Created for Shipathon 2026_
