@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remindy_app/data/dummy_data.dart';
 import 'package:remindy_app/screen/subscribe_screen.dart';
@@ -130,6 +131,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextField(
                       controller: _phoneCtrl,
                       keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(r'[0-9+]'),
+                      ],
                       decoration: InputDecoration(
                         hintText: "+6281234567890",
                         filled: true,
